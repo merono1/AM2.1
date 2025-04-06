@@ -21,12 +21,16 @@ def nuevo_hoja_trabajo():
 def editar_hoja_trabajo(id):
     # Obtenemos la hoja de trabajo junto con datos del proyecto y cliente.
     hoja = db.execute_query("""
-        SELECT h.*, pr.nombre_proyecto, cl.nombre AS cliente
+        SELECT h.*, pr.nombre_proyecto, cl.nombre AS cliente,
+            COALESCE(h.tecnico_encargado, 
+                (SELECT tecnico_encargado FROM presupuestos WHERE id_proyecto = h.id_proyecto ORDER BY id DESC LIMIT 1)
+            ) AS tecnico_encargado
         FROM hojas_trabajo h
         JOIN proyectos pr ON h.id_proyecto = pr.id
         JOIN clientes cl ON pr.id_cliente = cl.id
         WHERE h.id = ?
     """, (id,), fetchone=True)
+
     if not hoja:
         flash("Hoja de trabajo no encontrada.", "danger")
         return redirect(url_for("hojas_trabajo_bp.listar_hojas"))
