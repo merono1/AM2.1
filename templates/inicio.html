@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="mb-4">Gestión AM2.1</h1>
+    <div class="d-grid gap-3 col-6 mx-auto">
+        <a href="{{ url_for('clientes_bp.listar_clientes') }}" class="btn btn-outline-primary btn-lg">
+            Clientes
+        </a>
+        <a href="{{ url_for('proyectos_bp.listar_proyectos') }}" class="btn btn-outline-secondary btn-lg">
+            Proyectos
+        </a>
+        <a href="{{ url_for('proveedores_bp.listar_proveedores') }}" class="btn btn-outline-info btn-lg">
+            Proveedores
+        </a>
+    </div>
+</div>
+{% endblock %}

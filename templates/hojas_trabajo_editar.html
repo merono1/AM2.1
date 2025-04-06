@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <!-- Botón de acceso directo al listado de hojas de trabajo -->
+  <div class="mb-3">
+    <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-info">Ver Lista de Hojas de Trabajo</a>
+  </div>
+  <h2>Hoja de Trabajo</h2>
+  
+  <!-- Sección de datos esenciales en una sola línea -->
+  <div class="row mb-3">
+    <div class="col-md">
+      <label class="form-label">Referencia</label>
+      <input type="text" class="form-control" name="referencia" value="{{ hoja.referencia }}" readonly>
+    </div>
+    <div class="col-md">
+      <label class="form-label">Fecha</label>
+      <input type="date" class="form-control" name="fecha" value="{{ hoja.fecha }}" readonly>
+    </div>
+    <div class="col-md">
+      <label class="form-label">Técnico Encargado</label>
+      <input type="text" class="form-control" name="tecnico_encargado" value="{{ hoja.tecnico_encargado or 'Sin asignar' }}">
+    </div>
+    <div class="col-md">
+      <label class="form-label">Cliente</label>
+      <input type="text" class="form-control" name="cliente" value="{{ hoja.cliente or '' }}" readonly>
+    </div>
+    <div class="col-md">
+      <label class="form-label">Nombre de Proyecto</label>
+      <input type="text" class="form-control" name="nombre_proyecto" value="{{ hoja.nombre_proyecto }}" readonly>
+    </div>
+  </div>
+  
+  <!-- Formulario de edición con acción explícita -->
+  <form method="post" action="{{ url_for('hojas_trabajo_bp.editar_hoja_trabajo', id=hoja.id) }}">
+    
+    <!-- Sección de Capítulos y Partidas -->
+    <div>
+      <h3>Capítulos y Partidas</h3>
+      {% if capitulos %}
+        {% for cap in capitulos %}
+          {% set chap_idx = loop.index0 %}
+          <div class="card mb-3">
+            <div class="card-header">
+              Capítulo {{ loop.index }}
+              <input type="text" class="form-control d-inline-block w-50 ms-2" 
+                     name="capitulos[{{ chap_idx }}][descripcion]" value="{{ cap.descripcion }}">
+            </div>
+            <div class="card-body">
+              {% if cap.partidas %}
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th style="width:5%;" rowspan="2">Número</th>
+                      <th colspan="1" rowspan="2">Descripción</th>
+                    </tr>
+                    <tr>
+                      <th>Unitario</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Total</th>
+                      <th>Margen (%)</th>
+                      <th>Final</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for part in cap.partidas %}
+                      {% set part_idx = loop.index0 %}
+                      <tr>
+                        <!-- Primera fila: Número y descripción -->
+                        <td rowspan="2">{{ part.capitulo_numero }}</td>
+                        <td>
+                          <input type="text" class="form-control" 
+                                 name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][descripcion]"
+                                 value="{{ part.descripcion }}">
+                        </td>
+                      </tr>
+                      <tr>
+                        <!-- Segunda fila: Otros campos -->
+                        <td>
+                          <input type="text" class="form-control" placeholder="Unitario"
+                                 name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][unitario]"
+                                 value="{{ part.unitario }}">
+                        </td>
+                        <td>
+                          <input type="number" step="any" class="form-control" placeholder="Cantidad"
+                                 name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][cantidad]"
+                                 value="{{ part.cantidad }}">
+                        </td>
+                        <td>
+                          <input type="number" step="any" class="form-control" placeholder="Precio"
+                                 name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][precio]"
+                                 value="{{ part.precio }}">
+                        </td>
+                        <td>
+                          <input type="number" step="any" class="form-control" placeholder="Total"
+                                 name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][total]"
+                                 value="{{ part.total }}">
+                        </td>
+                        <td>
+                          <input type="number" step="any" class="form-control" placeholder="Margen (%)"
+                                 name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][margen]"
+                                 value="{{ part.margen }}">
+                        </td>
+                        <td>
+                          <input type="number" step="any" class="form-control" placeholder="Final"
+                                 name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][final]"
+                                 value="{{ part.final }}">
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% else %}
+                <p>No hay partidas para este capítulo.</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No hay capítulos asignados.</p>
+      {% endif %}
+    </div>
+    
+    <!-- Botones de acción -->
+    <div class="mt-3 d-flex justify-content-end">
+      <button type="submit" class="btn btn-success">Guardar Cambios</button>
+      <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

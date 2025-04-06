@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <h2>Listado de Proyectos</h2>
+  <table class="table table-bordered table-hover w-100">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Tipo Proyecto</th>
+        <th>Nombre Proyecto</th>
+        <th>Dirección</th>
+        <th>Población</th>
+        <th>Fecha Creación</th>
+        <th>Referencia</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for proyecto in proyectos %}
+      <tr>
+        <td>{{ proyecto[0] }}</td>
+        <td>{{ proyecto[1] }}</td>
+        <td>{{ proyecto[2] }}</td>
+        <td>{{ proyecto[3] }}</td>
+        <td>
+          {{ proyecto[4] or '' }} {{ proyecto[5] or '' }}
+          {% if proyecto[6] %}, {{ proyecto[6] }}{% endif %}
+          {% if proyecto[7] %} {{ proyecto[7] }}{% endif %}
+        </td>
+        <td>{{ proyecto[8] or '' }}</td>
+        <td>{{ proyecto[9] }}</td>
+        <td>{{ proyecto[10] }}</td>
+        <td>
+          <a href="{{ url_for('proyectos_bp.editar_proyecto', id=proyecto[0]) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+          <form action="{{ url_for('proyectos_bp.borrar_proyecto', id=proyecto[0]) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Borrar</button>
+          </form>
+          <!-- Enlace a nuevo presupuesto con el parámetro de proyecto -->
+          <a href="{{ url_for('presupuestos_bp.nuevo_presupuesto') }}?proyecto_id={{ proyecto[0] }}" class="btn btn-sm btn-outline-primary">Nuevo Presupuesto</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

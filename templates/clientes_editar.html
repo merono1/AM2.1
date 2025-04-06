@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Editar Cliente</h2>
+
+  <form method="post">
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre</label>
+      <input type="text" class="form-control" name="nombre" id="nombre" value="{{ cliente['nombre'] }}" required>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="tipo_via" class="form-label">Tipo de vía</label>
+        <select class="form-select" name="tipo_via" id="tipo_via">
+          <option value="">Seleccione tipo</option>
+          {% set tipos = [
+            'acceso', 'andador', 'avenida', 'calle', 'callejón', 'camino', 'carretera',
+            'cno. nuevo', 'cno. viejo', 'glorieta', 'pasaje', 'partida', 'paseo', 'plaza',
+            'polígono', 'ronda', 'travesía', 'urbanización', 'vía'
+          ] %}
+          {% for tipo in tipos %}
+            <option value="{{ tipo }}" {% if cliente['tipo_via'] == tipo %}selected{% endif %}>{{ tipo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="nombre_via" class="form-label">Nombre de la vía</label>
+        <input type="text" class="form-control" name="nombre_via" id="nombre_via" value="{{ cliente['nombre_via'] }}">
+      </div>
+      <div class="col-md-2 mb-3">
+        <label for="numero_via" class="form-label">Número</label>
+        <input type="text" class="form-control" name="numero_via" id="numero_via" value="{{ cliente['numero_via'] }}">
+      </div>
+      <div class="col-md-2 mb-3">
+        <label for="puerta" class="form-label">Puerta</label>
+        <input type="text" class="form-control" name="puerta" id="puerta" value="{{ cliente['puerta'] }}">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="codigo_postal" class="form-label">Código Postal</label>
+        <input type="text" class="form-control" name="codigo_postal" id="codigo_postal" value="{{ cliente['codigo_postal'] }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="poblacion" class="form-label">Población</label>
+        <input type="text" class="form-control" name="poblacion" id="poblacion" value="{{ cliente['poblacion'] }}">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="cif_nif" class="form-label">CIF / NIF</label>
+        <input type="text" class="form-control" name="cif_nif" id="cif_nif" value="{{ cliente['cif_nif'] }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="mail1" class="form-label">Email 1</label>
+        <input type="email" class="form-control" name="mail1" id="mail1" value="{{ cliente['mail1'] }}">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="mail2" class="form-label">Email 2</label>
+        <input type="email" class="form-control" name="mail2" id="mail2" value="{{ cliente['mail2'] }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="telefono1" class="form-label">Teléfono 1</label>
+        <input type="text" class="form-control" name="telefono1" id="telefono1" value="{{ cliente['telefono1'] }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="telefono2" class="form-label">Teléfono 2</label>
+        <input type="text" class="form-control" name="telefono2" id="telefono2" value="{{ cliente['telefono2'] }}">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label for="telefono3" class="form-label">Teléfono 3</label>
+        <input type="text" class="form-control" name="telefono3" id="telefono3" value="{{ cliente['telefono3'] }}">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="telefono4" class="form-label">Teléfono 4</label>
+        <input type="text" class="form-control" name="telefono4" id="telefono4" value="{{ cliente['telefono4'] }}">
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="mb-3">
+      <label for="notas" class="form-label">Notas</label>
+      <textarea class="form-control" name="notas" id="notas" rows="4">{{ cliente["notas"] or "" }}</textarea>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="tipo_cliente" class="form-label">Tipo de Cliente</label>
+        <select class="form-select" name="tipo_cliente" id="tipo_cliente" required>
+          <option value="">Seleccione tipo</option>
+          <option value="Empresa" {% if cliente["tipo_cliente"] == 'Empresa' %}selected{% endif %}>Empresa</option>
+          <option value="Particular" {% if cliente["tipo_cliente"] == 'Particular' %}selected{% endif %}>Particular</option>
+          <option value="Comunidad" {% if cliente["tipo_cliente"] == 'Comunidad' %}selected{% endif %}>Comunidad</option>
+        </select>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="categoria_cliente" class="form-label">Categoría</label>
+        <select class="form-select" name="categoria_cliente" id="categoria_cliente" required>
+          <option value="">Seleccione categoría</option>
+          <option value="A" {% if cliente["categoria_cliente"] == 'A' %}selected{% endif %}>Categoría A</option>
+          <option value="B" {% if cliente["categoria_cliente"] == 'B' %}selected{% endif %}>Categoría B</option>
+          <option value="C" {% if cliente["categoria_cliente"] == 'C' %}selected{% endif %}>Categoría C</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="{{ url_for('clientes_bp.listar_clientes') }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

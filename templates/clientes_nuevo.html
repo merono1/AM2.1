@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Nuevo Cliente</h2>
+
+  <form method="post">
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre</label>
+      <input type="text" class="form-control" name="nombre" id="nombre" required>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label for="tipo_via" class="form-label">Tipo de vía</label>
+        <select class="form-select" name="tipo_via" id="tipo_via">
+          <option value="">Seleccione tipo</option>
+          <option>acceso</option>
+          <option>andador</option>
+          <option>avenida</option>
+          <option>calle</option>
+          <option>callejón</option>
+          <option>camino</option>
+          <option>carretera</option>
+          <option>cno. nuevo</option>
+          <option>cno. viejo</option>
+          <option>glorieta</option>
+          <option>pasaje</option>
+          <option>partida</option>
+          <option>paseo</option>
+          <option>plaza</option>
+          <option>polígono</option>
+          <option>ronda</option>
+          <option>travesía</option>
+          <option>urbanización</option>
+          <option>vía</option>
+        </select>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label for="nombre_via" class="form-label">Nombre de la vía</label>
+        <input type="text" class="form-control" name="nombre_via" id="nombre_via">
+      </div>
+      <div class="col-md-2 mb-3">
+        <label for="numero_via" class="form-label">Número</label>
+        <input type="text" class="form-control" name="numero_via" id="numero_via">
+      </div>
+      <div class="col-md-2 mb-3">
+        <label for="puerta" class="form-label">Puerta</label>
+        <input type="text" class="form-control" name="puerta" id="puerta">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="codigo_postal" class="form-label">Código Postal</label>
+        <input type="text" class="form-control" name="codigo_postal" id="codigo_postal">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="poblacion" class="form-label">Población</label>
+        <input type="text" class="form-control" name="poblacion" id="poblacion">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="cif_nif" class="form-label">CIF / NIF</label>
+        <input type="text" class="form-control" name="cif_nif" id="cif_nif">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="mail1" class="form-label">Email 1</label>
+        <input type="email" class="form-control" name="mail1" id="mail1">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="mail2" class="form-label">Email 2</label>
+        <input type="email" class="form-control" name="mail2" id="mail2">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="telefono1" class="form-label">Teléfono 1</label>
+        <input type="text" class="form-control" name="telefono1" id="telefono1">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="telefono2" class="form-label">Teléfono 2</label>
+        <input type="text" class="form-control" name="telefono2" id="telefono2">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label for="telefono3" class="form-label">Teléfono 3</label>
+        <input type="text" class="form-control" name="telefono3" id="telefono3">
+      </div>
+      <div class="col-md-3 mb-3">
+        <label for="telefono4" class="form-label">Teléfono 4</label>
+        <input type="text" class="form-control" name="telefono4" id="telefono4">
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="mb-3">
+      <label for="notas" class="form-label">Notas</label>
+      <textarea class="form-control" name="notas" id="notas" rows="4"></textarea>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="tipo_cliente" class="form-label">Tipo de Cliente</label>
+        <select class="form-select" name="tipo_cliente" id="tipo_cliente" required>
+          <option value="">Seleccione tipo</option>
+          <option value="Empresa">Empresa</option>
+          <option value="Particular">Particular</option>
+          <option value="Comunidad">Comunidad</option>
+        </select>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="categoria_cliente" class="form-label">Categoría</label>
+        <select class="form-select" name="categoria_cliente" id="categoria_cliente" required>
+          <option value="">Seleccione categoría</option>
+          <option value="A">Categoría A</option>
+          <option value="B">Categoría B</option>
+          <option value="C">Categoría C</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Crear</button>
+    <a href="{{ url_for('clientes_bp.listar_clientes') }}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

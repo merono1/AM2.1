@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>
+    Nuevo Proyecto{% if cliente_nombre is defined and cliente_nombre %} - Cliente: {{ cliente_nombre }}{% endif %}
+  </h2>
+  <form method="post">
+    {% if cliente_id is defined and cliente_id %}
+      <input type="hidden" name="id_cliente" value="{{ cliente_id }}">
+    {% endif %}
+    <div class="row">
+      <!-- Columna izquierda: Campos del formulario -->
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label for="tipo_proyecto" class="form-label">Tipo de Proyecto</label>
+          <select class="form-select" name="tipo_proyecto" id="tipo_proyecto" required>
+            <option value="">Seleccione tipo</option>
+            <option>Reforma (varios oficios)</option>
+            <option>Albañilería</option>
+            <option>Fontanería</option>
+            <option>Electricidad</option>
+            <option>Carpintería (madera)</option>
+            <option>Carpintería metálica / cerrajería</option>
+            <option>Climatización / aire acondicionado</option>
+            <option>Calefacción</option>
+            <option>Energía solar (fotovoltaica / térmica)</option>
+            <option>Gas</option>
+            <option>Ascensores</option>
+            <option>Pintura</option>
+            <option>Vidrios y acristalamientos</option>
+            <option>Jardinería / paisajismo</option>
+            <option>Antenas y telecomunicaciones</option>
+            <option>Protección contra incendios</option>
+            <option>Domótica y automatización</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="nombre_proyecto" class="form-label">Nombre del Proyecto</label>
+          <input type="text" class="form-control" name="nombre_proyecto" id="nombre_proyecto" required>
+        </div>
+
+        <!-- Sección de Dirección -->
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="calle" class="form-label">Tipo de vía</label>
+            <select class="form-select" name="calle" id="calle">
+              <option value="">Seleccione tipo</option>
+              <option value="acceso">acceso</option>
+              <option value="andador">andador</option>
+              <option value="avenida">avenida</option>
+              <option value="calle" selected>calle</option>
+              <option value="callejón">callejón</option>
+              <option value="camino">camino</option>
+              <option value="carretera">carretera</option>
+              <option value="cno. nuevo">cno. nuevo</option>
+              <option value="cno. viejo">cno. viejo</option>
+              <option value="glorieta">glorieta</option>
+              <option value="pasaje">pasaje</option>
+              <option value="partida">partida</option>
+              <option value="paseo">paseo</option>
+              <option value="plaza">plaza</option>
+              <option value="polígono">polígono</option>
+              <option value="ronda">ronda</option>
+              <option value="travesía">travesía</option>
+              <option value="urbanización">urbanización</option>
+              <option value="vía">vía</option>
+            </select>
+          </div>
+          <div class="col-md-5 mb-3">
+            <label for="nombre_via" class="form-label">Nombre de la vía</label>
+            <input type="text" class="form-control" name="nombre_via" id="nombre_via">
+          </div>
+          <div class="col-md-2 mb-3">
+            <label for="numero" class="form-label">Número</label>
+            <input type="text" class="form-control" name="numero" id="numero">
+          </div>
+          <div class="col-md-2 mb-3">
+            <label for="puerta" class="form-label">Puerta</label>
+            <input type="text" class="form-control" name="puerta" id="puerta">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="codigo_postal" class="form-label">Código Postal</label>
+            <input type="text" class="form-control" name="codigo_postal" id="codigo_postal">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="poblacion" class="form-label">Población</label>
+            <input type="text" class="form-control" name="poblacion" id="poblacion">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Crear</button>
+      </div>
+      <!-- Columna derecha: Vacía por el momento -->
+      <div class="col-md-6">
+        <!-- Espacio reservado para futuros campos o información adicional -->
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

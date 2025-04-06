@@ -1,0 +1,203 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">Listado de Proveedores</h2>
+  <a href="{{ url_for('proveedores_bp.nuevo_proveedor') }}" class="btn btn-primary mb-3">
+    Nuevo Proveedor
+  </a>
+  <table class="table table-striped w-100">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Referencia</th>
+        <th>Tipo</th>
+        <th>Nombre</th>
+        <th>Razón Social</th>
+        <th>Dirección</th>
+        <th>Código Postal</th>
+        <th>Localidad</th>
+        <th>Provincia</th>
+        <th>País</th>
+        <th>Fecha Alta</th>
+        <th>Fecha Modificación</th>
+        <th>Teléfonos</th>
+        <th>Emails</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for prov in proveedores %}
+      <tr>
+        <!-- 1) ID -->
+        <td>{{ prov.id }}</td>
+        
+        <!-- 2) Referencia -->
+        <td>{{ prov.referencia }}</td>
+        
+        <!-- 3) Tipo -->
+        <td>{{ prov.tipo }}</td>
+        
+        <!-- 4) Nombre -->
+        <td>{{ prov.nombre }}</td>
+        
+        <!-- 5) Razón Social -->
+        <td>{{ prov.razon_social }}</td>
+        
+        <!-- 6) Dirección -->
+        <td>{{ prov.direccion }}</td>
+        
+        <!-- 7) Código Postal -->
+        <td>{{ prov.codigo_postal }}</td>
+        
+        <!-- 8) Localidad -->
+        <td>{{ prov.localidad }}</td>
+        
+        <!-- 9) Provincia -->
+        <td>{{ prov.provincia }}</td>
+        
+        <!-- 10) País -->
+        <td>{{ prov.pais }}</td>
+        
+        <!-- 11) Fecha Alta -->
+        <td>{{ prov.fecha_alta }}</td>
+        
+        <!-- 12) Fecha Modificación -->
+        <td>{{ prov.fecha_modificacion }}</td>
+        
+        <!-- 13) Teléfonos (con modal y botón de copiar) -->
+        <td>
+          {% set telefonos = [] %}
+          {% for tel in [prov.telefono1, prov.telefono2, prov.telefono3, prov.telefono4] %}
+            {% if tel %}
+              {% set _ = telefonos.append(tel) %}
+            {% endif %}
+          {% endfor %}
+          <button type="button" class="btn btn-sm btn-outline-info"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalTelefonos{{ prov.id }}">
+            {{ telefonos|length }} teléfono{{ 's' if telefonos|length != 1 }}
+          </button>
+          
+          <!-- Modal de teléfonos -->
+          <div class="modal fade" id="modalTelefonos{{ prov.id }}" tabindex="-1"
+               aria-labelledby="modalTelLabel{{ prov.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalTelLabel{{ prov.id }}">
+                    Teléfonos de {{ prov.nombre }}
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"
+                          aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  {% if telefonos %}
+                    <ul class="list-group">
+                      {% for tel in telefonos %}
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ tel }}</span>
+                        <button class="btn btn-sm btn-outline-secondary copiar-btn"
+                                data-valor="{{ tel }}">
+                          Copiar
+                        </button>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p>No hay teléfonos registrados.</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+        
+        <!-- 14) Emails (con modal y botón de copiar) -->
+        <td>
+          {% set emails = [] %}
+          {% for em in [prov.email1, prov.email2] %}
+            {% if em %}
+              {% set _ = emails.append(em) %}
+            {% endif %}
+          {% endfor %}
+          <button type="button" class="btn btn-sm btn-outline-info"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalEmails{{ prov.id }}">
+            {{ emails|length }} correo{{ 's' if emails|length != 1 }}
+          </button>
+          
+          <!-- Modal de correos -->
+          <div class="modal fade" id="modalEmails{{ prov.id }}" tabindex="-1"
+               aria-labelledby="modalEmailLabel{{ prov.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalEmailLabel{{ prov.id }}">
+                    Correos de {{ prov.nombre }}
+                  </h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"
+                          aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  {% if emails %}
+                    <ul class="list-group">
+                      {% for em in emails %}
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ em }}</span>
+                        <button class="btn btn-sm btn-outline-secondary copiar-btn"
+                                data-valor="{{ em }}">
+                          Copiar
+                        </button>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p>No hay correos registrados.</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+        
+        <!-- 15) Acciones (Editar, Borrar, etc.) -->
+        <td>
+          <a href="{{ url_for('proveedores_bp.editar_proveedor', id=prov.id) }}"
+             class="btn btn-sm btn-outline-secondary">
+            Editar
+          </a>
+          <form action="{{ url_for('proveedores_bp.borrar_proveedor', id=prov.id) }}"
+                method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-outline-danger"
+                    onclick="return confirm('¿Estás seguro de eliminar el proveedor?');">
+              Borrar
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="15" class="text-center">No se encontraron proveedores.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function(){
+    const botonesCopiar = document.querySelectorAll(".copiar-btn");
+    botonesCopiar.forEach(boton => {
+      boton.addEventListener("click", function() {
+        const valor = this.getAttribute("data-valor");
+        navigator.clipboard.writeText(valor).then(() => {
+          this.textContent = "Copiado";
+          setTimeout(() => {
+            this.textContent = "Copiar";
+          }, 1500);
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}

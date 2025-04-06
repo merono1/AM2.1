@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Editar Proyecto</h2>
+
+  <form method="post">
+    <div class="mb-3">
+      <label for="tipo_proyecto" class="form-label">Tipo de Proyecto</label>
+      <input type="text" class="form-control" name="tipo_proyecto" id="tipo_proyecto" value="{{ proyecto[2] }}">
+    </div>
+
+    <div class="mb-3">
+      <label for="nombre_proyecto" class="form-label">Nombre del Proyecto</label>
+      <input type="text" class="form-control" name="nombre_proyecto" id="nombre_proyecto" value="{{ proyecto[3] }}">
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label for="calle" class="form-label">Tipo de vía</label>
+        <select class="form-select" name="calle" id="calle">
+          {% set tipos = [
+            'acceso', 'andador', 'avenida', 'calle', 'callejón', 'camino', 'carretera',
+            'cno. nuevo', 'cno. viejo', 'glorieta', 'pasaje', 'partida', 'paseo',
+            'plaza', 'polígono', 'ronda', 'travesía', 'urbanización', 'vía'
+          ] %}
+          {% for tipo in tipos %}
+            <option value="{{ tipo }}" {% if proyecto[4] == tipo %}selected{% endif %}>{{ tipo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-5 mb-3">
+        <label for="nombre_via" class="form-label">Nombre de la vía</label>
+        <input type="text" class="form-control" name="nombre_via" id="nombre_via" value="{{ proyecto[5] }}">
+      </div>
+      <div class="col-md-2 mb-3">
+        <label for="numero" class="form-label">Número</label>
+        <input type="text" class="form-control" name="numero" id="numero" value="{{ proyecto[6] }}">
+      </div>
+      <div class="col-md-2 mb-3">
+        <label for="puerta" class="form-label">Puerta</label>
+        <input type="text" class="form-control" name="puerta" id="puerta" value="{{ proyecto[7] }}">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="codigo_postal" class="form-label">Código Postal</label>
+        <input type="text" class="form-control" name="codigo_postal" id="codigo_postal" value="{{ proyecto[8] }}">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="poblacion" class="form-label">Población</label>
+        <input type="text" class="form-control" name="poblacion" id="poblacion" value="{{ proyecto[9] }}">
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Guardar cambios</button>
+
+      <form method="post" action="{{ url_for('proyectos_bp.borrar_proyecto', id=proyecto[0]) }}" onsubmit="return confirm('¿Estás seguro de que quieres borrar este proyecto?')">
+        <button type="submit" class="btn btn-danger">Borrar</button>
+      </form>
+
+      <a href="{{ url_for('presupuestos_bp.nuevo_presupuesto_proyecto', proyecto_id=proyecto[0]) }}" class="btn btn-success">
+        Nuevo presupuesto
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

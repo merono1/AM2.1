@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <h2>Hojas de Trabajo</h2>
+  <a href="{{ url_for('hojas_trabajo_bp.nuevo_hoja_trabajo') }}" class="btn btn-primary mb-3">
+    Nueva Hoja de Trabajo
+  </a>
+  <table class="table table-striped w-100">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Referencia</th>
+        <th>Fecha</th>
+        <th>Título</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for hoja in hojas %}
+      <tr>
+        <td>{{ hoja.id }}</td>
+        <td>{{ hoja.referencia }}</td>
+        <td>{{ hoja.fecha }}</td>
+        <td>{{ hoja.titulo }}</td>
+        <td>{{ hoja.estado }}</td>
+        <td>
+          <a href="{{ url_for('hojas_trabajo_bp.editar_hoja_trabajo', id=hoja.id) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+          <form action="{{ url_for('hojas_trabajo_bp.borrar_hoja_trabajo', id=hoja.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Está seguro de borrar esta hoja de trabajo?');">Borrar</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" class="text-center">No se encontraron hojas de trabajo.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

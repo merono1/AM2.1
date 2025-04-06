@@ -1,0 +1,169 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  /* Permitir saltos de línea en las celdas */
+  #presupuestosTable td {
+    white-space: normal;
+    word-wrap: break-word;
+  }
+</style>
+<div class="container-fluid mt-4">
+  <h2>Presupuestos</h2>
+  <a href="{{ url_for('presupuestos_bp.nuevo_presupuesto') }}" class="btn btn-primary mb-3">Nuevo Presupuesto</a>
+  <table class="table table-striped" id="presupuestosTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Referencia</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Tipo Proyecto</th>
+        <th>Nombre Proyecto</th>
+        <th>Técnico Encargado</th>
+        <th>Aprobación</th>
+        <th>Fecha Aprobación</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in presupuestos %}
+      <tr data-id="{{ p[0] }}">
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>{{ p[2] }}</td>
+        <td>{{ p[3] }}</td>
+        <td>{{ p[4] }}</td>
+        <td>{{ p[5] }}</td>
+        <td>
+          <select class="form-select tecnico-select">
+            <option value="Toni" {% if p[6]=='Toni' %}selected{% endif %}>Toni</option>
+            <option value="Alejandro" {% if p[6]=='Alejandro' %}selected{% endif %}>Alejandro</option>
+            <option value="Blas" {% if p[6]=='Blas' %}selected{% endif %}>Blas</option>
+          </select>
+        </td>
+        <td>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input estado-radio" name="estado_{{ p[0] }}" value="aceptado" {% if p[7]=='aceptado' %}checked{% endif %}>
+            <label class="form-check-label">Aceptado</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="radio" class="form-check-input estado-radio" name="estado_{{ p[0] }}" value="rechazado" {% if p[7]=='rechazado' %}checked{% endif %}>
+            <label class="form-check-label">Rechazado</label>
+          </div>
+        </td>
+        <td>
+          <input type="text" class="form-control fecha-aprobacion" readonly value="{{ p[8] or '' }}">
+        </td>
+        <td>
+          <select class="form-select estado-select">
+            <option value="En estudio" {% if p[9]=='En estudio' %}selected{% endif %}>En estudio</option>
+            <option value="Estudiado" {% if p[9]=='Estudiado' %}selected{% endif %}>Estudiado</option>
+            <option value="Revision" {% if p[9]=='Revision' %}selected{% endif %}>Revision</option>
+            <option value="Enviado" {% if p[9]=='Enviado' %}selected{% endif %}>Enviado</option>
+            <option value="Pendiente de envio" {% if p[9]=='Pendiente de envio' %}selected{% endif %}>Pendiente de envio</option>
+            <option value="Ejecutado en ejecucion" {% if p[9]=='Ejecutado en ejecucion' %}selected{% endif %}>Ejecutado en ejecucion</option>
+          </select>
+        </td>
+        <td>
+          <!-- Botón que abre el popup para Hoja de Trabajo -->
+          <button type="button" class="btn btn-sm btn-outline-warning hoja-btn" data-presupuesto-id="{{ p[0] }}">Hoja de Trabajo</button>
+        </td>
+        <td>
+          <button type="button" class="btn btn-sm btn-outline-secondary modificar-btn">Editar Presupuesto</button>
+          <button type="button" class="btn btn-sm btn-outline-primary guardar-btn">Guardar Cambios</button>
+          <form action="{{ url_for('presupuestos_bp.borrar_presupuesto', id=p[0]) }}" method="post" style="display:inline;" onsubmit="return confirm('¿Está seguro de borrar este presupuesto?');">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Borrar Presupuesto</button>
+          </form>
+          <form action="{{ url_for('presupuestos_bp.clonar_presupuesto', id=p[0]) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-outline-info">Clonar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal para Hoja de Trabajo -->
+<div class="modal fade" id="hojaModal" tabindex="-1" aria-labelledby="hojaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="hojaModalLabel">Hoja de Trabajo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        ¿Generar nuevo archivo o acceder al archivo generado anteriormente?
+      </div>
+      <div class="modal-footer">
+        <!-- Formulario para generar nuevo archivo de trabajo -->
+        <form id="generarNuevoForm" method="post" style="display:inline;">
+          <button type="submit" class="btn btn-primary">Generar Nuevo</button>
+        </form>
+        <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary">Editar Archivo</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  var presupuestoId = null;
+  var hojaModal = new bootstrap.Modal(document.getElementById('hojaModal'));
+  
+  // Al pulsar el botón Hoja de Trabajo se guarda el presupuesto id y se actualiza la URL del formulario
+  document.querySelectorAll(".hoja-btn").forEach(function(button) {
+    button.addEventListener("click", function(){
+      presupuestoId = this.getAttribute("data-presupuesto-id");
+      var generarForm = document.getElementById("generarNuevoForm");
+      // Construimos la URL manualmente, evitando usar url_for con placeholder.
+      generarForm.action = "/hojas_trabajo/clonar/" + presupuestoId;
+      hojaModal.show();
+    });
+  });
+  
+  // Redirecciona al formulario de edición cuando se hace clic en "Editar Presupuesto"
+  document.querySelectorAll(".modificar-btn").forEach(function(btn) {
+    btn.addEventListener("click", function(){
+      var row = this.closest("tr");
+      var id = row.getAttribute("data-id");
+      window.location.href = "{{ url_for('presupuestos_bp.editar_presupuesto', id=0) }}".replace("0", id);
+    });
+  });
+  
+  // Guarda cambios vía AJAX al pulsar "Guardar Cambios"
+  document.querySelectorAll(".guardar-btn").forEach(function(btn) {
+    btn.addEventListener("click", function(){
+      var row = this.closest("tr");
+      guardarCambios(row);
+    });
+  });
+  
+  function guardarCambios(row) {
+    var id = row.getAttribute("data-id");
+    var tecnico = row.querySelector(".tecnico-select").value;
+    var estadoRadio = row.querySelector("input.estado-radio:checked");
+    var aprobacion = estadoRadio ? estadoRadio.value : "";
+    var fecha_aprobacion = row.querySelector(".fecha-aprobacion").value;
+    var estado = row.querySelector(".estado-select").value;
+    
+    var formData = new FormData();
+    formData.append("tecnico", tecnico);
+    formData.append("aprobacion", aprobacion);
+    formData.append("fecha_aprobacion", fecha_aprobacion);
+    formData.append("estado", estado);
+    
+    fetch("{{ url_for('presupuestos_bp.actualizar_presupuesto_estado', id=0) }}".replace("0", id), {
+      method: "POST",
+      body: formData
+    }).then(response => response.text())
+      .then(data => {
+        alert("Cambios guardados correctamente para el presupuesto " + id);
+      }).catch(error => {
+        alert("Error al guardar los cambios");
+      });
+  }
+});
+</script>
+{% endblock %}

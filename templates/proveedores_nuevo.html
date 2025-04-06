@@ -1,0 +1,124 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Nuevo Proveedor</h2>
+  <form method="post">
+    <!-- Tipo (botones de acción: Servicio o Suministro) -->
+    <div class="mb-3">
+      <label class="form-label">Tipo</label><br>
+      {% for t in tipos %}
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="tipo" value="{{ t }}" id="tipo_{{ t }}" {% if loop.first %}checked{% endif %}>
+          <label class="form-check-label" for="tipo_{{ t }}">{{ t }}</label>
+        </div>
+      {% endfor %}
+    </div>
+    <!-- Nombre y Razón Social -->
+    <div class="mb-3">
+      <label class="form-label">Nombre</label>
+      <input type="text" class="form-control" name="nombre" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Razón Social</label>
+      <input type="text" class="form-control" name="razon_social">
+    </div>
+    <!-- Dirección -->
+    <div class="mb-3">
+      <label class="form-label">Dirección</label>
+      <input type="text" class="form-control" name="direccion">
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label">Código Postal</label>
+        <input type="text" class="form-control" name="codigo_postal">
+      </div>
+      <div class="col">
+        <label class="form-label">Localidad</label>
+        <input type="text" class="form-control" name="localidad">
+      </div>
+      <div class="col">
+        <label class="form-label">Provincia</label>
+        <input type="text" class="form-control" name="provincia">
+      </div>
+      <div class="col">
+        <label class="form-label">País</label>
+        <input type="text" class="form-control" name="pais">
+      </div>
+    </div>
+    <!-- Teléfonos -->
+    <h4>Teléfonos</h4>
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label">Teléfono 1</label>
+        <input type="text" class="form-control" name="telefono1">
+      </div>
+      <div class="col">
+        <label class="form-label">Teléfono 2</label>
+        <input type="text" class="form-control" name="telefono2">
+      </div>
+      <div class="col">
+        <label class="form-label">Teléfono 3</label>
+        <input type="text" class="form-control" name="telefono3">
+      </div>
+      <div class="col">
+        <label class="form-label">Teléfono 4</label>
+        <input type="text" class="form-control" name="telefono4">
+      </div>
+    </div>
+    <!-- Emails -->
+    <h4>Emails</h4>
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label">Email 1</label>
+        <input type="email" class="form-control" name="email1">
+      </div>
+      <div class="col">
+        <label class="form-label">Email 2</label>
+        <input type="email" class="form-control" name="email2">
+      </div>
+    </div>
+    <!-- Persona de Contacto -->
+    <h4>Persona de Contacto</h4>
+    <div class="mb-3">
+      <label class="form-label">Nombre de Contacto</label>
+      <input type="text" class="form-control" name="contacto">
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label">Teléfono Contacto 1</label>
+        <input type="text" class="form-control" name="contacto_telefono1">
+      </div>
+      <div class="col">
+        <label class="form-label">Teléfono Contacto 2</label>
+        <input type="text" class="form-control" name="contacto_telefono2">
+      </div>
+      <div class="col">
+        <label class="form-label">Email Contacto</label>
+        <input type="email" class="form-control" name="contacto_email">
+      </div>
+    </div>
+    <!-- Especialidad -->
+    <div class="mb-3">
+      <label class="form-label">Especialidad</label>
+      <select class="form-select" name="especialidad">
+        <option value="Ninguna" selected>Ninguna</option>
+        {% for esp in especialidades %}
+          <option value="{{ esp }}">{{ esp }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <!-- Facturas -->
+    <div class="mb-3">
+      <label class="form-label">Facturas</label><br>
+      <button type="button" class="btn btn-outline-secondary" onclick="alert('Popup de facturas (pendiente de implementar)')">
+        0 facturas
+      </button>
+    </div>
+    <!-- Botones finales -->
+    <div class="d-flex justify-content-end">
+      <button type="submit" class="btn btn-success">Guardar Proveedor</button>
+      <a href="{{ url_for('proveedores_bp.listar_proveedores') }}" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

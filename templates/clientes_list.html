@@ -1,0 +1,172 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2 class="mt-4 mb-4">Listado de Clientes</h2>
+
+<a href="{{ url_for('clientes_bp.nuevo_cliente') }}" class="btn btn-success mb-3">+ Añadir Cliente</a>
+
+<table class="table table-bordered table-hover table-sm">
+  <thead class="table-light">
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Dirección</th>
+      <th>CIF/NIF</th>
+      <th>Teléfonos</th>
+      <th>Emails</th>
+      <th>Población</th>
+      <th>Tipo</th>
+      <th>Categoría</th>
+      <th>Notas</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cliente in clientes %}
+    <tr>
+      <td>{{ "%03d" % cliente["id"] }} </td>
+      <td>{{ cliente["nombre"] }}</td>
+      <td>
+        {{ cliente["tipo_via"] or "" }} {{ cliente["nombre_via"] or "" }}, {{ cliente["numero_via"] or "" }} {{ cliente["puerta"] or "" }} {{ cliente["codigo_postal"] or "" }},
+        {{ cliente["poblacion"] or "" }}
+      </td>
+      <td>{{ cliente["cif_nif"] or "" }}</td>
+      <td>
+        {% set telefonos = [] %}
+        {% for t in ["telefono1", "telefono2", "telefono3", "telefono4"] %}
+          {% if cliente[t] %}{% set _ = telefonos.append(cliente[t]) %}{% endif %}
+        {% endfor %}
+        <button type="button" class="btn btn-sm btn-outline-info"
+                data-bs-toggle="modal"
+                data-bs-target="#modalTelefonos{{ cliente['id'] }}">
+          {{ telefonos|length }} teléfono{{ 's' if telefonos|length != 1 }}
+        </button>
+      
+        <!-- Modal de teléfonos -->
+        <div class="modal fade" id="modalTelefonos{{ cliente['id'] }}" tabindex="-1" aria-labelledby="modalTelLabel{{ cliente['id'] }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalTelLabel{{ cliente['id'] }}">Teléfonos de {{ cliente['nombre'] }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                {% if telefonos %}
+                  <ul class="list-group">
+                    {% for tel in telefonos %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>{{ tel }}</span>
+                      <button class="btn btn-sm btn-outline-secondary copiar-btn" data-correo="{{ tel }}">Copiar</button>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p>No hay teléfonos registrados.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+      
+      <td>
+        {% set mails = [] %}
+        {% if cliente["mail1"] %}{% set _ = mails.append(cliente["mail1"]) %}{% endif %}
+        {% if cliente["mail2"] %}{% set _ = mails.append(cliente["mail2"]) %}{% endif %}
+        <button type="button" class="btn btn-sm btn-outline-info"
+                data-bs-toggle="modal"
+                data-bs-target="#modalCorreos{{ cliente['id'] }}">
+          {{ mails|length }} correo{{ 's' if mails|length != 1 }}
+        </button>
+
+        <!-- Modal de correos -->
+        <div class="modal fade" id="modalCorreos{{ cliente['id'] }}" tabindex="-1" aria-labelledby="modalLabel{{ cliente['id'] }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel{{ cliente['id'] }}">Emails de {{ cliente['nombre'] }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                {% if mails %}
+                  <ul class="list-group">
+                    {% for mail in mails %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>{{ mail }}</span>
+                      <button class="btn btn-sm btn-outline-secondary copiar-btn" data-correo="{{ mail }}">Copiar</button>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p>No hay correos registrados.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+      <td>{{ cliente["poblacion"] or "" }}</td>
+      <td>{{ cliente["tipo_cliente"] or "" }}</td>
+      <td>{{ cliente["categoria_cliente"] or "" }}</td>
+      <td>
+        {% if cliente["notas"] %}
+          <button type="button" class="btn btn-sm btn-outline-info"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalNotas{{ cliente['id'] }}">
+            Sí
+          </button>
+      
+          <!-- Modal de notas -->
+          <div class="modal fade" id="modalNotas{{ cliente['id'] }}" tabindex="-1" aria-labelledby="modalNotasLabel{{ cliente['id'] }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="post" action="{{ url_for('clientes_bp.actualizar_nota', cliente_id=cliente['id']) }}">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalNotasLabel{{ cliente['id'] }}">Notas de {{ cliente['nombre'] }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    <textarea name="nueva_nota" class="form-control" rows="6">{{ cliente["notas"] }}</textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar modificación</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          —
+        {% endif %}
+      </td>
+      
+      <td>
+        <a href="{{ url_for('clientes_bp.editar_cliente', cliente_id=cliente['id']) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+        <form action="{{ url_for('clientes_bp.borrar_cliente', cliente_id=cliente['id']) }}" method="post" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Borrar</button>
+        </form>
+        <a href="{{ url_for('proyectos_bp.nuevo_proyecto_cliente', cliente_id=cliente['id']) }}" class="btn btn-sm btn-outline-primary">Nuevo Proyecto</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const botones = document.querySelectorAll(".copiar-btn");
+    botones.forEach(boton => {
+      boton.addEventListener("click", function() {
+        const correo = this.getAttribute("data-correo");
+        navigator.clipboard.writeText(correo).then(() => {
+          this.textContent = "Copiado";
+          setTimeout(() => {
+            this.textContent = "Copiar";
+          }, 1500);
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}
