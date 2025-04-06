@@ -3,35 +3,31 @@
 <div class="container-fluid mt-4">
   <!-- Botón para volver al listado -->
   <div class="mb-3">
-    <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-info">Ver Lista de Hojas de Trabajo</a>
+    <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-info" title="Volver al listado de hojas de trabajo">Ver Lista de Hojas de Trabajo</a>
   </div>
-  <h2>Hoja de Trabajo</h2>
-
-
-
+  <h2 title="Hoja de Trabajo">Hoja de Trabajo</h2>
   
   <!-- Encabezado con datos básicos -->
   <div class="row mb-3">
     <div class="col-md">
-      <label class="form-label">Referencia</label>
-      <input type="text" class="form-control" name="referencia" value="{{ hoja.referencia }}" readonly>
+      <label class="form-label" for="referencia">Referencia</label>
+      <input type="text" class="form-control" id="referencia" name="referencia" value="{{ hoja.referencia }}" readonly title="Referencia" placeholder="Referencia">
     </div>
     <div class="col-md">
-      <label class="form-label">Fecha</label>
-      <input type="date" class="form-control" name="fecha" value="{{ hoja.fecha }}" readonly>
+      <label class="form-label" for="fecha">Fecha</label>
+      <input type="date" class="form-control" id="fecha" name="fecha" value="{{ hoja.fecha }}" readonly title="Fecha" placeholder="Fecha">
     </div>
     <div class="col-md">
-      <label class="form-label">Técnico Encargado</label>
-      <!-- Se usa el filtro default para mostrar "Sin asignar" si no existe valor -->
-      <input type="text" class="form-control" name="tecnico_encargado" value="{{ hoja.tecnico_encargado|default('Sin asignar') }}">
+      <label class="form-label" for="tecnico_encargado">Técnico Encargado</label>
+      <input type="text" class="form-control" id="tecnico_encargado" name="tecnico_encargado" value="{{ hoja.tecnico_encargado|default('Sin asignar') }}" title="Técnico Encargado" placeholder="Técnico Encargado">
     </div>
     <div class="col-md">
-      <label class="form-label">Cliente</label>
-      <input type="text" class="form-control" name="cliente" value="{{ hoja.cliente|default('') }}" readonly>
+      <label class="form-label" for="cliente">Cliente</label>
+      <input type="text" class="form-control" id="cliente" name="cliente" value="{{ hoja.cliente|default('') }}" readonly title="Cliente" placeholder="Cliente">
     </div>
     <div class="col-md">
-      <label class="form-label">Nombre de Proyecto</label>
-      <input type="text" class="form-control" name="nombre_proyecto" value="{{ hoja.nombre_proyecto }}" readonly>
+      <label class="form-label" for="nombre_proyecto">Nombre de Proyecto</label>
+      <input type="text" class="form-control" id="nombre_proyecto" name="nombre_proyecto" value="{{ hoja.nombre_proyecto }}" readonly title="Nombre de Proyecto" placeholder="Nombre de Proyecto">
     </div>
   </div>
   
@@ -45,10 +41,10 @@
             <div class="card-header">
               <div class="row align-items-center">
                 <div class="col-auto">
-                  <h4 class="mb-0">Capítulo {{ loop.index }}</h4>
+                  <h4 class="mb-0" title="Capítulo {{ loop.index }}">Capítulo {{ loop.index }}</h4>
                 </div>
                 <div class="col">
-                  <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][descripcion]" value="{{ cap.descripcion }}" placeholder="Descripción del capítulo" required>
+                  <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][descripcion]" value="{{ cap.descripcion }}" placeholder="Descripción del capítulo" required title="Descripción del capítulo">
                 </div>
               </div>
             </div>
@@ -60,39 +56,39 @@
                     <!-- Primera fila: Número y Descripción -->
                     <div class="row">
                       <div class="col-1">
-                        <label class="form-label" style="font-size:0.8rem;">No.</label>
-                        <div class="fw-bold">{{ part.capitulo_numero }}</div>
+                        <label class="form-label small-label" title="Número">No.</label>
+                        <div class="fw-bold" title="Número de partida">{{ part.capitulo_numero }}</div>
                       </div>
                       <div class="col-11">
-                        <label class="form-label" style="font-size:0.8rem;">Descripción</label>
-                        <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][descripcion]" value="{{ part.descripcion }}" placeholder="Descripción" required>
+                        <label class="form-label small-label" title="Descripción">Descripción</label>
+                        <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][descripcion]" value="{{ part.descripcion }}" placeholder="Descripción" required title="Descripción de la partida">
                       </div>
                     </div>
                     <!-- Segunda fila: Campos Unitario, Cantidad, Precio, Total, Margen, Final -->
                     <div class="row mt-2">
                       <div class="col">
-                        <label class="form-label" style="font-size:0.8rem;">Unitario</label>
-                        <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][unitario]" value="{{ part.unitario }}" placeholder="Unitario" required>
+                        <label class="form-label small-label" title="Unitario">Unitario</label>
+                        <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][unitario]" value="{{ part.unitario }}" placeholder="Unitario" required title="Unidad de medida">
                       </div>
                       <div class="col">
-                        <label class="form-label" style="font-size:0.8rem;">Cantidad</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][cantidad]" value="{{ part.cantidad }}" placeholder="Cantidad" required>
+                        <label class="form-label small-label" title="Cantidad">Cantidad</label>
+                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][cantidad]" value="{{ part.cantidad }}" placeholder="Cantidad" required title="Cantidad">
                       </div>
                       <div class="col">
-                        <label class="form-label" style="font-size:0.8rem;">Precio (€)</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][precio]" value="{{ part.precio }}" placeholder="Precio" required>
+                        <label class="form-label small-label" title="Precio (€)">Precio (€)</label>
+                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][precio]" value="{{ part.precio }}" placeholder="Precio" required title="Precio en euros">
                       </div>
                       <div class="col">
-                        <label class="form-label" style="font-size:0.8rem;">Total</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][total]" value="{{ part.total }}" placeholder="Total" readonly>
+                        <label class="form-label small-label" title="Total">Total</label>
+                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][total]" value="{{ part.total }}" placeholder="Total" readonly title="Total">
                       </div>
                       <div class="col">
-                        <label class="form-label" style="font-size:0.8rem;">Margen (%)</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][margen]" value="{{ part.margen }}" placeholder="Margen (%)" required>
+                        <label class="form-label small-label" title="Margen (%)">Margen (%)</label>
+                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][margen]" value="{{ part.margen }}" placeholder="Margen (%)" required title="Margen de beneficio en porcentaje">
                       </div>
                       <div class="col">
-                        <label class="form-label" style="font-size:0.8rem;">Final</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][final]" value="{{ part.final }}" placeholder="Final" readonly>
+                        <label class="form-label small-label" title="Final">Final</label>
+                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][final]" value="{{ part.final }}" placeholder="Final" readonly title="Precio final">
                       </div>
                     </div>
                   </div>
@@ -110,8 +106,8 @@
     
     <!-- Botones de acción -->
     <div class="mt-3 d-flex justify-content-end">
-      <button type="submit" class="btn btn-success">Guardar Cambios</button>
-      <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary ms-2">Cancelar</a>
+      <button type="submit" class="btn btn-success" title="Guardar Cambios">Guardar Cambios</button>
+      <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary ms-2" title="Cancelar">Cancelar</a>
     </div>
   </form>
 </div>
