@@ -8,8 +8,18 @@ db = DBHelper()
 
 @hojas_trabajo_bp.route("/hojas_trabajo")
 def listar_hojas():
-    hojas = db.execute_query("SELECT * FROM hojas_trabajo ORDER BY id DESC", fetch=True)
+    hojas = db.execute_query("""
+        SELECT h.*, pr.nombre_proyecto, cl.nombre AS cliente,
+            COALESCE(h.tecnico_encargado, 
+                (SELECT tecnico_encargado FROM presupuestos WHERE id_proyecto = h.id_proyecto ORDER BY id DESC LIMIT 1)
+            ) AS tecnico_encargado
+        FROM hojas_trabajo h
+        JOIN proyectos pr ON h.id_proyecto = pr.id
+        JOIN clientes cl ON pr.id_cliente = cl.id
+        ORDER BY h.id DESC
+    """, fetch=True)
     return render_template("hojas_trabajo_list.html", hojas=hojas)
+
 
 @hojas_trabajo_bp.route("/hojas_trabajo/nuevo", methods=["GET", "POST"])
 def nuevo_hoja_trabajo():

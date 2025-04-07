@@ -35,7 +35,7 @@
         <!-- Bloque Título -->
         <div class="mb-3">
           <label class="form-label">Título del presupuesto</label>
-          <input type="text" class="form-control" name="titulo" id="titulo">
+          <input type="text" class="form-control" name="titulo" id="titulo" value="{% if presupuesto %}{{ presupuesto.titulo }}{% else %}{{ titulo }}{% endif %}">
         </div>
 
         <!-- Referencia y Fecha -->
@@ -138,7 +138,7 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
             </div>
           </div>
         </div>
-        
+
         <hr>
         {% set capitulos_options = [
           "Trabajos preliminares", "Demoliciones", "Movimiento de tierras", "Cimentaciones",
@@ -165,7 +165,6 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
                   </select>
                   <button type="button" class="btn btn-danger btn-sm deleteCapituloBtn">Borrar Capítulo</button>
                 </div>
-                
                 <!-- Contenedor de partidas -->
                 <div class="partidasContainer" data-capitulo-index="{{ cap_idx }}" data-partida-index="{{ capitulo.partidas|length }}">
                   {% for partida in capitulo.partidas %}
@@ -222,7 +221,7 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
               </div>
             {% endfor %}
           {% else %}
-            <!-- Si no hay capítulos, el contenedor se deja vacío para que al agregar un capítulo se inserte correctamente -->
+            <!-- Si no hay capítulos, se deja el contenedor vacío -->
           {% endif %}
         </div>
         
@@ -453,11 +452,8 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
     });
     
     let capituloContainer = document.getElementById('capitulosContainer');
-    // Si no se han pasado capítulos (para nuevo presupuesto, capitulos debe venir como []), forzamos capituloCount a 0.
     let capituloCount = capituloContainer.children.length;
-    if (!capituloCount) {
-      capituloCount = 0;
-    }
+    if (!capituloCount) { capituloCount = 0; }
     
     document.getElementById('addCapituloBtn').addEventListener('click', function() {
       capituloCount++;

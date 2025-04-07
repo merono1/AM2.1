@@ -12,6 +12,7 @@
         <th>Referencia</th>
         <th>Fecha</th>
         <th>Título</th>
+        <th>Técnico Encargado</th>
         <th>Estado</th>
         <th>Acciones</th>
       </tr>
@@ -23,6 +24,7 @@
         <td>{{ hoja.referencia }}</td>
         <td>{{ hoja.fecha }}</td>
         <td>{{ hoja.titulo }}</td>
+        <td>{{ hoja.tecnico_encargado or "Sin asignar" }}</td>
         <td>{{ hoja.estado }}</td>
         <td>
           <a href="{{ url_for('hojas_trabajo_bp.editar_hoja_trabajo', id=hoja.id) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
@@ -33,7 +35,7 @@
       </tr>
       {% else %}
       <tr>
-        <td colspan="6" class="text-center">No se encontraron hojas de trabajo.</td>
+        <td colspan="7" class="text-center">No se encontraron hojas de trabajo.</td>
       </tr>
       {% endfor %}
     </tbody>
