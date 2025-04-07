@@ -2,7 +2,95 @@
 {% block content %}
 <div class="container-fluid mt-4">
   <h2>Presupuestos</h2>
-  <a href="{{ url_for('presupuestos_bp.nuevo_presupuesto') }}" class="btn btn-primary mb-3" title="Crear un nuevo presupuesto">Nuevo Presupuesto</a>
+  
+  <!-- Contenedor de Filtros Avanzados -->
+  <div class="card mb-3">
+    <div class="card-header">Filtros Avanzados</div>
+    <div class="card-body">
+      <div class="row g-3">
+        <!-- Filtro Fecha (Desde y Hasta) -->
+        <div class="col-md-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="filterFechaCheck">
+            <label class="form-check-label" for="filterFechaCheck">Fecha</label>
+          </div>
+          <div class="input-group mt-1">
+            <span class="input-group-text">Desde</span>
+            <input type="date" id="filterFechaDesde" class="form-control" disabled>
+          </div>
+          <div class="input-group mt-1">
+            <span class="input-group-text">Hasta</span>
+            <input type="date" id="filterFechaHasta" class="form-control" disabled>
+          </div>
+        </div>
+        <!-- Filtro Técnico Encargado -->
+        <div class="col-md-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="filterTecnicoCheck">
+            <label class="form-check-label" for="filterTecnicoCheck">Técnico</label>
+          </div>
+          <select id="filterTecnico" class="form-select" disabled>
+            <option value="">Todos</option>
+            <option value="Toni">Toni</option>
+            <option value="Alejandro">Alejandro</option>
+            <option value="Blas">Blas</option>
+          </select>
+        </div>
+        <!-- Filtro Tipo de Proyecto -->
+        <div class="col-md-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="filterTipoCheck">
+            <label class="form-check-label" for="filterTipoCheck">Tipo Proyecto</label>
+          </div>
+          <select id="filterTipo" class="form-select" disabled>
+            <option value="">Todos</option>
+            <!-- Opciones de ejemplo; ajusta según tus datos -->
+            <option value="tipo1">Tipo1</option>
+            <option value="tipo2">Tipo2</option>
+            <option value="tipo3">Tipo3</option>
+          </select>
+        </div>
+        <!-- Filtro Estado -->
+        <div class="col-md-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="filterEstadoCheck">
+            <label class="form-check-label" for="filterEstadoCheck">Estado</label>
+          </div>
+          <select id="filterEstado" class="form-select" disabled>
+            <option value="">Todos</option>
+            <option value="En estudio">En estudio</option>
+            <option value="Estudiado">Estudiado</option>
+            <option value="Revision">Revision</option>
+            <option value="Enviado">Enviado</option>
+            <option value="Pendiente de envio">Pendiente de envio</option>
+            <option value="Ejecutado en ejecucion">Ejecutado en ejecucion</option>
+          </select>
+        </div>
+        <!-- Filtro Cliente -->
+        <div class="col-md-2">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="filterClienteCheck">
+            <label class="form-check-label" for="filterClienteCheck">Cliente</label>
+          </div>
+          <select id="filterCliente" class="form-select" disabled>
+            <option value="">Todos</option>
+            <!-- Opciones de ejemplo; reemplaza por tus datos -->
+            <option value="cliente1">Cliente1</option>
+            <option value="cliente2">Cliente2</option>
+            <option value="cliente3">Cliente3</option>
+          </select>
+        </div>
+      </div>
+      <button id="applyFilters" class="btn btn-primary mt-3">Aplicar Filtros</button>
+    </div>
+  </div>
+  
+  <!-- Filtro de Búsqueda Sencillo (sin tick) -->
+  <div class="mb-3">
+    <label for="searchInput" class="form-label">Buscar:</label>
+    <input type="text" id="searchInput" class="form-control" placeholder="Ingresa texto para buscar...">
+  </div>
+  
   <table class="table table-striped" id="presupuestosTable">
     <thead>
       <tr>
@@ -16,6 +104,7 @@
         <th>Aprobación</th>
         <th>Fecha Aprobación</th>
         <th>Estado</th>
+        <th>Hoja</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -60,17 +149,19 @@
           </select>
         </td>
         <td>
-          <button type="button" class="btn btn-sm btn-outline-warning hoja-btn" data-presupuesto-id="{{ p[0] }}" title="Abrir hoja de trabajo">Hoja de Trabajo</button>
+          <button type="button" class="btn btn-sm btn-warning hoja-btn" data-presupuesto-id="{{ p[0] }}" title="Abrir hoja de trabajo" style="border-radius: 0.25rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">H.Trabajo</button>
         </td>
         <td>
-          <button type="button" class="btn btn-sm btn-outline-secondary modificar-btn" title="Editar presupuesto">Editar Presupuesto</button>
-          <button type="button" class="btn btn-sm btn-outline-primary guardar-btn" title="Guardar cambios">Guardar Cambios</button>
-          <form action="{{ url_for('presupuestos_bp.borrar_presupuesto', id=p[0]) }}" method="post" class="d-inline" onsubmit="return confirm('¿Está seguro de borrar este presupuesto?');">
-            <button type="submit" class="btn btn-sm btn-outline-danger" title="Borrar presupuesto">Borrar Presupuesto</button>
-          </form>
-          <form action="{{ url_for('presupuestos_bp.clonar_presupuesto', id=p[0]) }}" method="post" class="d-inline">
-            <button type="submit" class="btn btn-sm btn-outline-info" title="Clonar presupuesto">Clonar</button>
-          </form>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm btn-secondary modificar-btn" title="Editar presupuesto" style="border-radius: 0.25rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">Editar</button>
+            <button type="button" class="btn btn-sm btn-primary guardar-btn" title="Guardar cambios" style="border-radius: 0.25rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">Guardar</button>
+            <form action="{{ url_for('presupuestos_bp.borrar_presupuesto', id=p[0]) }}" method="post" class="d-inline" onsubmit="return confirm('¿Está seguro de borrar este presupuesto?');">
+              <button type="submit" class="btn btn-sm btn-danger" title="Borrar presupuesto" style="border-radius: 0.25rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">Borrar</button>
+            </form>
+            <form action="{{ url_for('presupuestos_bp.clonar_presupuesto', id=p[0]) }}" method="post" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-info" title="Clonar presupuesto" style="border-radius: 0.25rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">Clonar</button>
+            </form>
+          </div>
         </td>
       </tr>
       {% endfor %}
@@ -91,94 +182,186 @@
       </div>
       <div class="modal-footer">
         <form id="generarNuevoForm" method="post" class="d-inline">
-          <button type="submit" class="btn btn-primary" title="Generar nuevo archivo de trabajo">Generar Nuevo</button>
+          <button type="submit" class="btn btn-primary" title="Generar nuevo archivo de trabajo" style="border-radius: 0.25rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">Generar Nuevo</button>
         </form>
-        <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary" title="Editar archivo existente">Editar Archivo</a>
+        <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary" title="Editar archivo existente" style="border-radius: 0.25rem; box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);">Editar Archivo</a>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
-  var presupuestoId = null;
-  var hojaModal = new bootstrap.Modal(document.getElementById('hojaModal'));
-  
-  document.querySelectorAll(".hoja-btn").forEach(function(button) {
-    button.addEventListener("click", function(){
-      presupuestoId = this.getAttribute("data-presupuesto-id");
-      var generarForm = document.getElementById("generarNuevoForm");
-      generarForm.action = "/hojas_trabajo/clonar/" + presupuestoId;
-      hojaModal.show();
+  document.addEventListener("DOMContentLoaded", function(){
+    // Habilitar/deshabilitar cada filtro según el tick
+    document.getElementById("filterFechaCheck").addEventListener("change", function() {
+      document.getElementById("filterFechaDesde").disabled = !this.checked;
+      document.getElementById("filterFechaHasta").disabled = !this.checked;
     });
-  });
-  
-  document.querySelectorAll(".modificar-btn").forEach(function(btn) {
-    btn.addEventListener("click", function(){
-      var row = this.closest("tr");
-      var id = row.getAttribute("data-id");
-      window.location.href = "{{ url_for('presupuestos_bp.editar_presupuesto', id=0) }}".replace("0", id);
+    document.getElementById("filterTecnicoCheck").addEventListener("change", function() {
+      document.getElementById("filterTecnico").disabled = !this.checked;
     });
-  });
+    document.getElementById("filterTipoCheck").addEventListener("change", function() {
+      document.getElementById("filterTipo").disabled = !this.checked;
+    });
+    document.getElementById("filterEstadoCheck").addEventListener("change", function() {
+      document.getElementById("filterEstado").disabled = !this.checked;
+    });
+    document.getElementById("filterClienteCheck").addEventListener("change", function() {
+      document.getElementById("filterCliente").disabled = !this.checked;
+    });
   
-  function guardarCambios(row) {
-    var id = row.getAttribute("data-id");
-    var tecnico = row.querySelector(".tecnico-select").value;
-    var estadoRadio = row.querySelector("input.estado-radio:checked");
-    var aprobacion = estadoRadio ? estadoRadio.value : "";
-    var fecha_aprobacion = row.querySelector(".fecha-aprobacion").value;
-    var estado = row.querySelector(".estado-select").value;
-    
-    var formData = new FormData();
-    formData.append("tecnico", tecnico);
-    formData.append("aprobacion", aprobacion);
-    formData.append("fecha_aprobacion", fecha_aprobacion);
-    formData.append("estado", estado);
-    
-    fetch("{{ url_for('presupuestos_bp.actualizar_presupuesto_estado', id=0) }}".replace("0", id), {
-      method: "POST",
-      body: formData
-    }).then(response => response.text())
-      .then(data => {
-        console.log("Cambios guardados correctamente para el presupuesto " + id);
-      }).catch(error => {
-        console.error("Error al guardar los cambios", error);
+    function applyAllFilters() {
+      // Valores de filtros avanzados
+      var filterFechaActive = document.getElementById("filterFechaCheck").checked;
+      var fechaDesde = document.getElementById("filterFechaDesde").value;
+      var fechaHasta = document.getElementById("filterFechaHasta").value;
+      var filterTecnicoActive = document.getElementById("filterTecnicoCheck").checked;
+      var filterTecnico = document.getElementById("filterTecnico").value.toLowerCase();
+      var filterTipoActive = document.getElementById("filterTipoCheck").checked;
+      var filterTipo = document.getElementById("filterTipo").value.toLowerCase();
+      var filterEstadoActive = document.getElementById("filterEstadoCheck").checked;
+      var filterEstado = document.getElementById("filterEstado").value.toLowerCase();
+      var filterClienteActive = document.getElementById("filterClienteCheck").checked;
+      var filterCliente = document.getElementById("filterCliente").value.toLowerCase();
+  
+      // Valor del filtro de búsqueda sencillo
+      var searchValue = document.getElementById("searchInput").value.toLowerCase();
+  
+      var rows = document.querySelectorAll("#presupuestosTable tbody tr");
+      rows.forEach(function(row) {
+        // Se usan innerText para capturar el contenido visible
+        var fechaText = row.cells[2].innerText.trim();
+        var clienteText = row.cells[3].innerText.trim().toLowerCase();
+        var tipoText = row.cells[4].innerText.trim().toLowerCase();
+        var tecnicoText = row.cells[6].innerText.trim().toLowerCase();
+        var estadoText = row.cells[9].innerText.trim().toLowerCase();
+        var rowText = row.innerText.toLowerCase();
+  
+        var showRow = true;
+  
+        // Filtro por fecha (columna 2) si está activo y la celda contiene una fecha
+        if (filterFechaActive && fechaText) {
+          var rowDate = new Date(fechaText);
+          if (!isNaN(rowDate)) {  // solo si la fecha es válida
+            if (fechaDesde) {
+              var desdeDate = new Date(fechaDesde);
+              if (rowDate < desdeDate) showRow = false;
+            }
+            if (fechaHasta) {
+              var hastaDate = new Date(fechaHasta);
+              if (rowDate > hastaDate) showRow = false;
+            }
+          }
+        }
+  
+        // Filtro por técnico (columna 6)
+        if (filterTecnicoActive && filterTecnico !== "" && tecnicoText.indexOf(filterTecnico) === -1) {
+          showRow = false;
+        }
+        // Filtro por tipo de proyecto (columna 4)
+        if (filterTipoActive && filterTipo !== "" && tipoText.indexOf(filterTipo) === -1) {
+          showRow = false;
+        }
+        // Filtro por estado (columna 9)
+        if (filterEstadoActive && filterEstado !== "" && estadoText.indexOf(filterEstado) === -1) {
+          showRow = false;
+        }
+        // Filtro por cliente (columna 3)
+        if (filterClienteActive && filterCliente !== "" && clienteText.indexOf(filterCliente) === -1) {
+          showRow = false;
+        }
+        // Filtro de búsqueda sencillo: se revisa todo el contenido de la fila
+        if (searchValue && rowText.indexOf(searchValue) === -1) {
+          showRow = false;
+        }
+        row.style.display = showRow ? "" : "none";
       });
-  }
+    }
   
-  // Escuchar cambios en los radio buttons de estado
-  document.querySelectorAll("input.estado-radio").forEach(function(radio) {
-    radio.addEventListener("change", function(){
-      var row = this.closest("tr");
-      // Actualizar la fecha de aprobación con la fecha actual
-      var fechaInput = row.querySelector(".fecha-aprobacion");
-      var today = new Date();
-      var yyyy = today.getFullYear();
-      var mm = String(today.getMonth() + 1).padStart(2, "0");
-      var dd = String(today.getDate()).padStart(2, "0");
-      var todayStr = yyyy + "-" + mm + "-" + dd;
-      if (this.value === "aceptado" || this.value === "rechazado") {
-        fechaInput.value = todayStr;
-      }
-      // Actualizar color de la fila según el estado
-      row.classList.remove("table-success", "table-danger");
-      if (this.value === "aceptado") {
-        row.classList.add("table-success");
-      } else if (this.value === "rechazado") {
-        row.classList.add("table-danger");
-      }
-      // Guardar los cambios vía AJAX
-      guardarCambios(row);
+    // Evento para el botón "Aplicar Filtros"
+    document.getElementById("applyFilters").addEventListener("click", function(){
+      applyAllFilters();
+    });
+  
+    // Evento para el filtro de búsqueda (filtra en tiempo real)
+    document.getElementById("searchInput").addEventListener("keyup", function(){
+      applyAllFilters();
+    });
+  
+    // Los scripts que ya tenías para el modal, modificar, guardar, etc.
+    var hojaModal = new bootstrap.Modal(document.getElementById('hojaModal'));
+    
+    document.querySelectorAll(".hoja-btn").forEach(function(button) {
+      button.addEventListener("click", function(){
+        var presupuestoId = this.getAttribute("data-presupuesto-id");
+        var generarForm = document.getElementById("generarNuevoForm");
+        generarForm.action = "/hojas_trabajo/clonar/" + presupuestoId;
+        hojaModal.show();
+      });
+    });
+    
+    document.querySelectorAll(".modificar-btn").forEach(function(btn) {
+      btn.addEventListener("click", function(){
+        var row = this.closest("tr");
+        var id = row.getAttribute("data-id");
+        window.location.href = "{{ url_for('presupuestos_bp.editar_presupuesto', id=0) }}".replace("0", id);
+      });
+    });
+    
+    function guardarCambios(row) {
+      var id = row.getAttribute("data-id");
+      var tecnico = row.querySelector(".tecnico-select").value;
+      var estadoRadio = row.querySelector("input.estado-radio:checked");
+      var aprobacion = estadoRadio ? estadoRadio.value : "";
+      var fecha_aprobacion = row.querySelector(".fecha-aprobacion").value;
+      var estado = row.querySelector(".estado-select").value;
+      
+      var formData = new FormData();
+      formData.append("tecnico", tecnico);
+      formData.append("aprobacion", aprobacion);
+      formData.append("fecha_aprobacion", fecha_aprobacion);
+      formData.append("estado", estado);
+      
+      fetch("{{ url_for('presupuestos_bp.actualizar_presupuesto_estado', id=0) }}".replace("0", id), {
+        method: "POST",
+        body: formData
+      }).then(response => response.text())
+        .then(data => {
+          console.log("Cambios guardados correctamente para el presupuesto " + id);
+        }).catch(error => {
+          console.error("Error al guardar los cambios", error);
+        });
+    }
+    
+    document.querySelectorAll("input.estado-radio").forEach(function(radio) {
+      radio.addEventListener("change", function(){
+        var row = this.closest("tr");
+        var fechaInput = row.querySelector(".fecha-aprobacion");
+        var today = new Date();
+        var yyyy = today.getFullYear();
+        var mm = String(today.getMonth() + 1).padStart(2, "0");
+        var dd = String(today.getDate()).padStart(2, "0");
+        var todayStr = yyyy + "-" + mm + "-" + dd;
+        if (this.value === "aceptado" || this.value === "rechazado") {
+          fechaInput.value = todayStr;
+        }
+        row.classList.remove("table-success", "table-danger");
+        if (this.value === "aceptado") {
+          row.classList.add("table-success");
+        } else if (this.value === "rechazado") {
+          row.classList.add("table-danger");
+        }
+        guardarCambios(row);
+      });
+    });
+    
+    document.querySelectorAll(".guardar-btn").forEach(function(btn) {
+      btn.addEventListener("click", function(){
+        var row = this.closest("tr");
+        guardarCambios(row);
+      });
     });
   });
+  </script>
   
-  // También el botón "Guardar Cambios" de cada fila
-  document.querySelectorAll(".guardar-btn").forEach(function(btn) {
-    btn.addEventListener("click", function(){
-      var row = this.closest("tr");
-      guardarCambios(row);
-    });
-  });
-});
-</script>
 {% endblock %}
