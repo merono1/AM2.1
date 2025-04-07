@@ -8,9 +8,11 @@ db = DBHelper()
 
 def generar_referencia_presupuesto(proyecto_id):
     fecha = datetime.now().strftime("%d%m%y")
+    # Se obtiene el tipo de proyecto según el id proporcionado
     tipo = db.execute_query("SELECT tipo_proyecto FROM proyectos WHERE id = ?", (proyecto_id,), fetchone=True)
     if tipo:
         tipo_proyecto = tipo[0]
+        # Si el tipo tiene al menos 5 caracteres se usan posiciones 0,2,4, de lo contrario se toman los tres primeros
         letras = (tipo_proyecto[0] + tipo_proyecto[2] + tipo_proyecto[4]).upper() if len(tipo_proyecto) >= 5 else tipo_proyecto[:3].upper()
     else:
         letras = "XXX"
@@ -35,6 +37,7 @@ def listar_presupuestos():
 def nuevo_presupuesto():
     proyectos = db.execute_query("SELECT id, nombre_proyecto FROM proyectos", fetch=True)
     datos_proyecto = {}
+    # Se puede pasar proyecto_id desde la URL (por ejemplo, ?proyecto_id=5)
     proyecto_id_param = request.args.get("proyecto_id")
     if proyecto_id_param:
         proyecto_info = db.execute_query("""
@@ -59,7 +62,24 @@ def nuevo_presupuesto():
                 "proyecto_nombre": proyecto_info[0]
             }
     if request.method == "POST":
+
+            # Depuración: mostrar todos los datos enviados en el formulario
+        print("Datos recibidos del formulario:", request.form)
+        # También puedes usar logging, por ejemplo:
+        # import logging
+        # logging.debug("Datos del formulario: %s", request.form)
+        
         proyecto_id = request.form.get("proyecto_id")
+        titulo = request.form.get("titulo")
+        print("Valor de título recibido:", repr(titulo))
+        ...
+        # Se obtiene el proyecto_id desde el formulario (asegurándose que esté presente)
+        proyecto_id = request.form.get("proyecto_id")
+        if not proyecto_id:
+            flash("Debe seleccionar un proyecto.", "danger")
+            return render_template("presupuesto_nuevo.html", proyectos=proyectos, capitulos=[], **datos_proyecto)
+
+        
         titulo = request.form.get("titulo")
         tipo_via = request.form.get("tipo_via")
         nombre_via = request.form.get("nombre_via")
@@ -78,7 +98,7 @@ def nuevo_presupuesto():
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (proyecto_id, referencia, fecha, tipo_via, nombre_via, numero_via, puerta, codigo_postal, poblacion, titulo, notas))
 
-        # Extraer capítulos y partidas del formulario usando el índice de partida
+        # Procesamiento de capítulos y partidas del formulario
         form_dict = request.form.to_dict(flat=False)
         chapters = {}
         chapter_pattern = re.compile(r'capitulos\[(\d+)\]\[tipo\]')
@@ -100,7 +120,6 @@ def nuevo_presupuesto():
                 if part_idx not in partidas_group[cap_idx]:
                     partidas_group[cap_idx][part_idx] = {}
                 partidas_group[cap_idx][part_idx][field] = values[0]
-        # Asignar las partidas a cada capítulo ordenándolas por su índice
         for cap_idx, parts in partidas_group.items():
             if cap_idx in chapters:
                 for part_idx in sorted(parts.keys(), key=int):
@@ -157,11 +176,11 @@ def editar_presupuesto(id):
             WHERE id = ?
         """, (titulo, tipo_via, nombre_via, numero_via, puerta, codigo_postal, poblacion, notas, id))
         
-        # Eliminar capítulos y partidas existentes para este presupuesto
+        # Se eliminan los capítulos y partidas existentes para este presupuesto
         db.execute_query("DELETE FROM capitulos WHERE id_presupuesto = ?", (id,))
         db.execute_query("DELETE FROM partidas WHERE id_presupuesto = ?", (id,))
         
-        # Extraer los nuevos capítulos y partidas del formulario
+        # Se procesan los nuevos capítulos y partidas del formulario
         form_dict = request.form.to_dict(flat=False)
         chapters = {}
         chapter_pattern = re.compile(r'capitulos\[(\d+)\]\[tipo\]')
@@ -263,10 +282,8 @@ def clonar_presupuesto(id):
         flash("Presupuesto no encontrado.", "danger")
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
     
-    # Extraer la referencia base quitando cualquier sufijo " Vn" previo
     base_ref = re.sub(r" V\d+$", "", original["referencia"])
     
-    # Buscar clones que ya tengan esa base con versión
     clones = db.execute_query("SELECT referencia FROM presupuestos WHERE referencia LIKE ?", (f"{base_ref} V%",), fetch=True)
     if clones:
         versions = []

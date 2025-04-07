@@ -13,8 +13,7 @@
     </div>
     <div class="card-body">
       <form method="post">
-        {# Bloque Proyecto - si lo deseas ocultar, puedes comentar el siguiente bloque #}
-        {#
+        <!-- Bloque Proyecto: se envía el campo "proyecto_id" -->
         {% if proyecto_id %}
           <input type="hidden" name="proyecto_id" value="{{ proyecto_id }}">
           <div class="mb-3">
@@ -32,17 +31,14 @@
             </select>
           </div>
         {% endif %}
-        #}
-        
-        {# Bloque Título - comentado para ocultarlo #}
-        {#
+
+        <!-- Bloque Título -->
         <div class="mb-3">
           <label class="form-label">Título del presupuesto</label>
-          <input type="text" class="form-control" name="titulo" id="titulo" value="...">
+          <input type="text" class="form-control" name="titulo" id="titulo">
         </div>
-        #}
-        
-        <!-- Referencia y Fecha en una fila -->
+
+        <!-- Referencia y Fecha -->
         <div class="row mb-3">
           <div class="col-12 col-md-8">
             <label class="form-label">Referencia</label>
@@ -58,10 +54,10 @@
                    readonly>
           </div>
         </div>
-        
-        <!-- Sección de Notas y Datos de Dirección -->
+
+        <!-- Notas y Datos de Dirección -->
         <div class="row">
-          <!-- Columna de Notas -->
+          <!-- Notas -->
           <div class="col-md-6">
             <h5>Notas</h5>
             <div class="mb-3">
@@ -69,7 +65,6 @@
 {% if presupuesto %}{{ presupuesto.notas }}{% else %}
 CONDICIONES:
 1. Forma de Pago
-
 50% del importe total a la firma del contrato.
 El restante se abonará mediante certificaciones mensuales conforme al avance de los trabajos.
 2. Responsabilidad Civil
@@ -84,8 +79,7 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
 {% endif %}
               </textarea>
             </div>
-            
-            <!-- Campo de Margen Medio reubicado en esta columna -->
+            <!-- Margen Medio -->
             <div class="mb-3">
               <label class="form-label">Margen Medio (%)</label>
               <input type="number" step="any" id="margenMedio" class="form-control">
@@ -94,8 +88,7 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
               </small>
             </div>
           </div>
-          
-          <!-- Columna de Datos de Dirección -->
+          <!-- Datos de Dirección -->
           <div class="col-md-6">
             <h5>Datos de Dirección</h5>
             <div class="row mb-3">
@@ -156,12 +149,12 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
           "Servicios documentales"
         ] %}
         <div id="capitulosContainer">
-          {% if capitulos is defined %}
+          {% if capitulos is defined and capitulos|length > 0 %}
             {% for capitulo in capitulos %}
               {% set cap_idx = loop.index0 %}
               {% set cap_index = loop.index %}
               <div class="capitulo mb-4 border p-3" data-capitulo-index="{{ cap_idx }}">
-                <!-- Cabecera del capítulo en una sola línea -->
+                <!-- Cabecera del capítulo -->
                 <div class="d-flex align-items-center mb-3">
                   <h4 class="mb-0 me-2">Capítulo {{ cap_index }}</h4>
                   <select name="capitulos[{{ cap_idx }}][tipo]" class="form-select w-auto me-2" required>
@@ -177,7 +170,6 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
                 <div class="partidasContainer" data-capitulo-index="{{ cap_idx }}" data-partida-index="{{ capitulo.partidas|length }}">
                   {% for partida in capitulo.partidas %}
                     <div class="partida border p-2 mb-2">
-                      <!-- Línea 1: Número y Descripción -->
                       <div class="row mb-2">
                         <div class="col">
                           <div class="d-flex align-items-center">
@@ -186,8 +178,6 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
                           </div>
                         </div>
                       </div>
-                      
-                      <!-- Línea 2: Campos y botones en la misma fila -->
                       <div class="row align-items-center">
                         <div class="col-md-2">
                           <label class="form-label">Unitarios</label>
@@ -220,28 +210,26 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
                           <label class="form-label">Final</label>
                           <input type="number" step="any" name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][final]" class="form-control partida-final" readonly value="{{ partida.final }}">
                         </div>
-                        
                         <div class="col-12 text-end mt-2">
                           <button type="button" class="btn btn-danger btn-sm deletePartidaBtn">Borrar Partida</button>
-                          <button type="button" class="btn btn-info btn-sm addPartidaBtn" data-capitulo-index="{{ cap_idx }}">Nueva Partida</button>
                         </div>
                       </div>
                     </div>
                   {% endfor %}
                 </div>
-                
-                <!-- BOTÓN RECUPERADO -->
+                <!-- Botón "Nueva Partida" para este capítulo -->
                 <button type="button" class="btn btn-info btn-sm addPartidaBtn" data-capitulo-index="{{ cap_idx }}">Nueva Partida</button>
-                <!-- FIN BOTÓN RECUPERADO -->
               </div>
             {% endfor %}
+          {% else %}
+            <!-- Si no hay capítulos, el contenedor se deja vacío para que al agregar un capítulo se inserte correctamente -->
           {% endif %}
         </div>
         
         <!-- Botón para agregar un capítulo nuevo -->
         <button type="button" class="btn btn-outline-secondary mb-3" id="addCapituloBtn">Agregar Capítulo</button>
         
-        <!-- Botones finales: Guardar / Cancelar -->
+        <!-- Botones finales -->
         <div class="d-flex justify-content-end">
           <button type="submit" class="btn btn-success me-2">
             {% if presupuesto %}
@@ -418,7 +406,6 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
           </div>
           <div class="col-12 text-end mt-2">
             <button type="button" class="btn btn-danger btn-sm deletePartidaBtn">Borrar Partida</button>
-            <button type="button" class="btn btn-info btn-sm addPartidaBtn" data-capitulo-index="${capituloIndex}">Nueva Partida</button>
           </div>
         </div>
     `;
@@ -450,9 +437,6 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
     partidaDiv.querySelector('.deletePartidaBtn').addEventListener('click', function() {
       deletePartida(this);
     });
-    partidaDiv.querySelector('.addPartidaBtn').addEventListener('click', function() {
-      addPartida(capituloIndex, parseInt(capituloIndex) + 1);
-    });
   }
 
   document.addEventListener("DOMContentLoaded", function(){
@@ -469,7 +453,11 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
     });
     
     let capituloContainer = document.getElementById('capitulosContainer');
+    // Si no se han pasado capítulos (para nuevo presupuesto, capitulos debe venir como []), forzamos capituloCount a 0.
     let capituloCount = capituloContainer.children.length;
+    if (!capituloCount) {
+      capituloCount = 0;
+    }
     
     document.getElementById('addCapituloBtn').addEventListener('click', function() {
       capituloCount++;
@@ -491,12 +479,19 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
           </div>
           <div class="partidasContainer" data-capitulo-index="${capituloIndex}" data-partida-index="0">
           </div>
+          <button type="button" class="btn btn-info btn-sm addPartidaBtn" data-capitulo-index="${capituloIndex}">Nueva Partida</button>
       `;
       
       capituloContainer.appendChild(capituloDiv);
       
       capituloDiv.querySelector('.deleteCapituloBtn').addEventListener('click', function() {
         deleteCapitulo(this);
+      });
+      
+      // Asignar listener al botón "Nueva Partida" del nuevo capítulo
+      capituloDiv.querySelector('.addPartidaBtn').addEventListener('click', function() {
+        const capIndex = this.getAttribute('data-capitulo-index');
+        addPartida(capIndex, parseInt(capIndex) + 1);
       });
       
       recalcIndices();
