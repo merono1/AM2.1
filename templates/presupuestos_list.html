@@ -10,40 +10,42 @@
   <!-- Cabecera con título y buscador -->
   <div class="row mb-3 align-items-center">
     <div class="col-md-8">
-      <h2 style="font-size:1.5rem;">Presupuestos</h2>
+      <h2 class="title-presupuestos" title="Presupuestos" aria-label="Presupuestos">Presupuestos</h2>
     </div>
     <div class="col-md-4 text-end">
-      <input type="text" id="searchInput" class="form-control" placeholder="Buscar..." style="max-width:200px; display:inline-block; font-size:0.8rem;">
+      <input type="text" id="searchInput" class="form-control search-input" placeholder="Buscar..." aria-label="Buscar">
     </div>
   </div>
   
   <!-- Contenedor de Filtros Avanzados en una sola línea -->
-  <div class="card mb-3" style="font-size:0.8rem;">
-    <div class="card-header" style="font-size:0.8rem;">Filtros Avanzados</div>
-    <div class="card-body">
+  <div class="card mb-3 filters-container">
+    <div class="card-header filters-header" title="Filtros Avanzados" aria-label="Filtros Avanzados">Filtros Avanzados</div>
+    <div class="card-body filters-body">
       <div class="row g-2 align-items-center">
         <!-- Filtro Fecha -->
         <div class="col-auto">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterFechaCheck">
+            <input class="form-check-input" type="checkbox" id="filterFechaCheck" aria-label="Activar filtro de fecha">
             <label class="form-check-label" for="filterFechaCheck">Fecha</label>
           </div>
           <div class="input-group">
-            <span class="input-group-text" style="font-size:0.8rem;">Desde</span>
-            <input type="date" id="filterFechaDesde" class="form-control" disabled style="max-width:100px; font-size:0.8rem;">
+            <span class="input-group-text date-label" title="Desde" aria-label="Desde">Desde</span>
+            <input type="date" id="filterFechaDesde" class="form-control date-input" disabled 
+                   title="Fecha desde" aria-label="Fecha desde" placeholder="Desde">
           </div>
           <div class="input-group">
-            <span class="input-group-text" style="font-size:0.8rem;">Hasta</span>
-            <input type="date" id="filterFechaHasta" class="form-control" disabled style="max-width:100px; font-size:0.8rem;">
+            <span class="input-group-text date-label" title="Hasta" aria-label="Hasta">Hasta</span>
+            <input type="date" id="filterFechaHasta" class="form-control date-input" disabled 
+                   title="Fecha hasta" aria-label="Fecha hasta" placeholder="Hasta">
           </div>
         </div>
         <!-- Filtro Técnico -->
         <div class="col-auto">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterTecnicoCheck">
+            <input class="form-check-input" type="checkbox" id="filterTecnicoCheck" aria-label="Activar filtro por técnico">
             <label class="form-check-label" for="filterTecnicoCheck">Técnico</label>
           </div>
-          <select id="filterTecnico" class="form-select" disabled style="max-width:120px; font-size:0.8rem;">
+          <select id="filterTecnico" class="form-select filter-select" disabled aria-label="Filtrar por técnico">
             <option value="">Todos</option>
             <option value="Toni">Toni</option>
             <option value="Alejandro">Alejandro</option>
@@ -53,10 +55,10 @@
         <!-- Filtro Tipo Proyecto -->
         <div class="col-auto">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterTipoCheck">
+            <input class="form-check-input" type="checkbox" id="filterTipoCheck" aria-label="Activar filtro por tipo de proyecto">
             <label class="form-check-label" for="filterTipoCheck">Tipo Proyecto</label>
           </div>
-          <select id="filterTipo" class="form-select" disabled style="max-width:150px; font-size:0.8rem;">
+          <select id="filterTipo" class="form-select filter-select" disabled aria-label="Filtrar por tipo de proyecto">
             <option value="">Todos</option>
             <option value="Reforma (varios oficios)">Reforma (varios oficios)</option>
             <option value="Albañilería">Albañilería</option>
@@ -80,10 +82,10 @@
         <!-- Filtro Estado -->
         <div class="col-auto">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterEstadoCheck">
+            <input class="form-check-input" type="checkbox" id="filterEstadoCheck" aria-label="Activar filtro por estado">
             <label class="form-check-label" for="filterEstadoCheck">Estado</label>
           </div>
-          <select id="filterEstado" class="form-select" disabled style="max-width:100px; font-size:0.8rem;">
+          <select id="filterEstado" class="form-select filter-select" disabled aria-label="Filtrar por estado">
             <option value="">Todos</option>
             <option value="en estudio">En estudio</option>
             <option value="estudiado">Estudiado</option>
@@ -96,10 +98,10 @@
         <!-- Filtro Aprobación -->
         <div class="col-auto">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterAprobacionCheck">
+            <input class="form-check-input" type="checkbox" id="filterAprobacionCheck" aria-label="Activar filtro por aprobación">
             <label class="form-check-label" for="filterAprobacionCheck">Aprobación</label>
           </div>
-          <select id="filterAprobacion" class="form-select" disabled style="max-width:100px; font-size:0.8rem;">
+          <select id="filterAprobacion" class="form-select filter-select" disabled aria-label="Filtrar por aprobación">
             <option value="">Todos</option>
             <option value="aceptado">Aceptado</option>
             <option value="rechazado">Rechazado</option>
@@ -108,10 +110,10 @@
         <!-- Filtro Cliente -->
         <div class="col-auto">
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="filterClienteCheck">
+            <input class="form-check-input" type="checkbox" id="filterClienteCheck" aria-label="Activar filtro por cliente">
             <label class="form-check-label" for="filterClienteCheck">Cliente</label>
           </div>
-          <select id="filterCliente" class="form-select" disabled style="max-width:200px; font-size:0.8rem;">
+          <select id="filterCliente" class="form-select filter-select" disabled aria-label="Filtrar por cliente">
             <option value="">Todos</option>
             {% for client in clientNames %}
               <option value="{{ client|trim }}">{{ client }}</option>
@@ -119,12 +121,12 @@
           </select>
         </div>
       </div>
-      <button id="applyFilters" class="btn btn-primary mt-3" style="font-size:0.8rem;">Aplicar Filtros</button>
+      <button id="applyFilters" class="btn btn-primary filters-btn" aria-label="Aplicar filtros">Aplicar Filtros</button>
     </div>
   </div>
-  
+
   <!-- Tabla de Presupuestos -->
-  <table class="table table-striped" id="presupuestosTable" style="font-size:0.8rem;">
+  <table class="table table-striped" id="presupuestosTable">
     <thead>
       <tr>
         <th>ID</th>
@@ -143,8 +145,7 @@
     </thead>
     <tbody>
       {% for p in presupuestos %}
-      <tr data-id="{{ p[0] }}"
-          class="{% if p[7]=='aceptado' %}table-success{% elif p[7]=='rechazado' %}table-danger{% endif %}">
+      <tr data-id="{{ p[0] }}" class="{% if p[7]=='aceptado' %}table-success{% elif p[7]=='rechazado' %}table-danger{% endif %}">
         <td>{{ p[0] }}</td>
         <td>{{ p[1] }}</td>
         <td>{{ p[2] }}</td>
@@ -152,27 +153,28 @@
         <td>{{ p[4] }}</td>
         <td>{{ p[5] }}</td>
         <td>
-          <select class="form-select tecnico-select" title="Seleccione técnico encargado" style="max-width:120px; font-size:0.8rem;">
+          <select class="form-select tecnico-select" title="Seleccione técnico" aria-label="Técnico">
             <option value="Toni" {% if p[6]=='Toni' %}selected{% endif %}>Toni</option>
             <option value="Alejandro" {% if p[6]=='Alejandro' %}selected{% endif %}>Alejandro</option>
             <option value="Blas" {% if p[6]=='Blas' %}selected{% endif %}>Blas</option>
           </select>
         </td>
         <td>
-          <div class="form-check form-check-inline" style="font-size:0.8rem;">
-            <input type="radio" class="form-check-input estado-radio" name="estado_{{ p[0] }}" value="aceptado" {% if p[7]=='aceptado' %}checked{% endif %} title="Aprobado">
-            <label class="form-check-label" title="Aprobado">Aceptado</label>
+          <div class="form-check form-check-inline" title="Aprobado" aria-label="Aprobado">
+            <input type="radio" class="form-check-input estado-radio" name="estado_{{ p[0] }}" value="aceptado" title="Marcar como aceptado" {% if p[7]=='aceptado' %}checked{% endif %}>
+            <label class="form-check-label">Aceptado</label>
           </div>
-          <div class="form-check form-check-inline" style="font-size:0.8rem;">
-            <input type="radio" class="form-check-input estado-radio" name="estado_{{ p[0] }}" value="rechazado" {% if p[7]=='rechazado' %}checked{% endif %} title="Rechazado">
-            <label class="form-check-label" title="Rechazado">Rechazado</label>
+          <div class="form-check form-check-inline" title="Rechazado" aria-label="Rechazado">
+            <input type="radio" class="form-check-input estado-radio" name="estado_{{ p[0] }}" value="rechazado" title="Marcar como rechazado" {% if p[7]=='rechazado' %}checked{% endif %}>
+            <label class="form-check-label">Rechazado</label>
           </div>
         </td>
         <td>
-          <input type="text" class="form-control fecha-aprobacion" readonly value="{{ p[8] or '' }}" title="Fecha de aprobación" placeholder="Fecha de aprobación" style="max-width:100px; font-size:0.8rem;">
+          <input type="text" class="form-control fecha-aprobacion" readonly 
+                 value="{{ p[8] or '' }}" title="Fecha de aprobación" aria-label="Fecha de aprobación">
         </td>
         <td>
-          <select class="form-select estado-select" title="Seleccione estado" style="max-width:120px; font-size:0.8rem;">
+          <select class="form-select estado-select" title="Seleccione estado" aria-label="Estado">
             <option value="En estudio" {% if p[9]=='En estudio' %}selected{% endif %}>En estudio</option>
             <option value="Estudiado" {% if p[9]=='Estudiado' %}selected{% endif %}>Estudiado</option>
             <option value="Revision" {% if p[9]=='Revision' %}selected{% endif %}>Revision</option>
@@ -182,17 +184,17 @@
           </select>
         </td>
         <td>
-          <button type="button" class="btn btn-sm btn-warning hoja-btn" data-presupuesto-id="{{ p[0] }}" title="Abrir hoja de trabajo" style="border-radius:0.25rem; box-shadow:0 .125rem .25rem rgba(0,0,0,0.075); font-size:0.8rem;">H.Trabajo</button>
+          <button type="button" class="btn btn-sm btn-warning hoja-btn" data-presupuesto-id="{{ p[0] }}" title="Abrir hoja de trabajo" aria-label="Hoja de Trabajo">H.Trabajo</button>
         </td>
         <td>
           <div class="d-flex flex-wrap gap-1">
-            <button type="button" class="btn btn-sm btn-secondary modificar-btn" title="Editar presupuesto" style="border-radius:0.25rem; box-shadow:0 .125rem .25rem rgba(0,0,0,0.075); font-size:0.8rem;">Editar</button>
-            <button type="button" class="btn btn-sm btn-primary guardar-btn" title="Guardar cambios" style="border-radius:0.25rem; box-shadow:0 .125rem .25rem rgba(0,0,0,0.075); font-size:0.8rem;">Guardar</button>
+            <button type="button" class="btn btn-sm btn-secondary modificar-btn" title="Editar presupuesto" aria-label="Editar">Editar</button>
+            <button type="button" class="btn btn-sm btn-primary guardar-btn" title="Guardar cambios" aria-label="Guardar">Guardar</button>
             <form action="{{ url_for('presupuestos_bp.borrar_presupuesto', id=p[0]) }}" method="post" class="d-inline" onsubmit="return confirm('¿Está seguro de borrar este presupuesto?');">
-              <button type="submit" class="btn btn-sm btn-danger" title="Borrar presupuesto" style="border-radius:0.25rem; box-shadow:0 .125rem .25rem rgba(0,0,0,0.075); font-size:0.8rem;">Borrar</button>
+              <button type="submit" class="btn btn-sm btn-danger" title="Borrar presupuesto" aria-label="Borrar">Borrar</button>
             </form>
             <form action="{{ url_for('presupuestos_bp.clonar_presupuesto', id=p[0]) }}" method="post" class="d-inline">
-              <button type="submit" class="btn btn-sm btn-info" title="Clonar presupuesto" style="border-radius:0.25rem; box-shadow:0 .125rem .25rem rgba(0,0,0,0.075); font-size:0.8rem;">Clonar</button>
+              <button type="submit" class="btn btn-sm btn-info" title="Clonar presupuesto" aria-label="Clonar">Clonar</button>
             </form>
           </div>
         </td>
@@ -207,202 +209,21 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="hojaModalLabel" title="Hoja de Trabajo">Hoja de Trabajo</h5>
+        <h5 class="modal-title" id="hojaModalLabel" title="Hoja de Trabajo" aria-label="Hoja de Trabajo">Hoja de Trabajo</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" title="Cerrar"></button>
       </div>
-      <div class="modal-body" title="Opciones de Hoja de Trabajo">
+      <div class="modal-body" title="Opciones de Hoja de Trabajo" aria-label="Opciones de Hoja de Trabajo">
         ¿Generar nuevo archivo o acceder al archivo generado anteriormente?
       </div>
       <div class="modal-footer">
         <form id="generarNuevoForm" method="post" class="d-inline">
-          <button type="submit" class="btn btn-primary" title="Generar nuevo archivo de trabajo" style="border-radius:0.25rem; box-shadow:0 .125rem .25rem rgba(0,0,0,0.075); font-size:0.8rem;">Generar Nuevo</button>
+          <button type="submit" class="btn btn-primary" title="Generar nuevo archivo de trabajo" aria-label="Generar Nuevo">Generar Nuevo</button>
         </form>
-        <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary" title="Editar archivo existente" style="border-radius:0.25rem; box-shadow:0 .125rem .25rem rgba(0,0,0,0.075); font-size:0.8rem;">Editar Archivo</a>
+        <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary" title="Editar archivo existente" aria-label="Editar Archivo">Editar Archivo</a>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Habilitar/deshabilitar controles de filtros avanzados
-    document.getElementById("filterFechaCheck").addEventListener("change", function() {
-        document.getElementById("filterFechaDesde").disabled = !this.checked;
-        document.getElementById("filterFechaHasta").disabled = !this.checked;
-    });
-    document.getElementById("filterTecnicoCheck").addEventListener("change", function() {
-        document.getElementById("filterTecnico").disabled = !this.checked;
-    });
-    document.getElementById("filterTipoCheck").addEventListener("change", function() {
-        document.getElementById("filterTipo").disabled = !this.checked;
-    });
-    document.getElementById("filterEstadoCheck").addEventListener("change", function() {
-        document.getElementById("filterEstado").disabled = !this.checked;
-    });
-    document.getElementById("filterClienteCheck").addEventListener("change", function() {
-        document.getElementById("filterCliente").disabled = !this.checked;
-    });
-    document.getElementById("filterAprobacionCheck").addEventListener("change", function() {
-        document.getElementById("filterAprobacion").disabled = !this.checked;
-    });
-
-    // Función para aplicar todos los filtros (búsqueda simple + avanzados)
-    function applyAllFilters() {
-        var filterFechaActive = document.getElementById("filterFechaCheck").checked;
-        var fechaDesde = document.getElementById("filterFechaDesde").value;
-        var fechaHasta = document.getElementById("filterFechaHasta").value;
-        var filterTecnicoActive = document.getElementById("filterTecnicoCheck").checked;
-        var filterTecnico = document.getElementById("filterTecnico").value.toLowerCase();
-        var filterTipoActive = document.getElementById("filterTipoCheck").checked;
-        var filterTipo = document.getElementById("filterTipo").value.toLowerCase();
-        var filterEstadoActive = document.getElementById("filterEstadoCheck").checked;
-        var filterEstado = document.getElementById("filterEstado").value.toLowerCase();
-        var filterAprobacionActive = document.getElementById("filterAprobacionCheck").checked;
-        var filterAprobacion = document.getElementById("filterAprobacion").value.toLowerCase();
-        var filterClienteActive = document.getElementById("filterClienteCheck").checked;
-        var filterCliente = document.getElementById("filterCliente").value.toLowerCase();
-
-        var searchValue = document.getElementById("searchInput").value.toLowerCase();
-
-        var rows = document.querySelectorAll("#presupuestosTable tbody tr");
-        rows.forEach(function(row) {
-            var showRow = true;
-            // Búsqueda simple en celdas 0 a 5 (ID, Referencia, Fecha, Cliente, Tipo Proyecto, Nombre Proyecto)
-            var cellText = "";
-            for (var i = 0; i <= 5; i++) {
-                if (row.cells[i]) {
-                    cellText += row.cells[i].innerText.toLowerCase() + " ";
-                }
-            }
-            if (searchValue && cellText.indexOf(searchValue) === -1) {
-                showRow = false;
-            }
-            // Filtro por fecha (columna 2)
-            if (filterFechaActive && row.cells[2]) {
-                var fechaText = row.cells[2].innerText.trim();
-                if (fechaText) {
-                    var rowDate = new Date(fechaText);
-                    if (!isNaN(rowDate)) {
-                        if (fechaDesde && rowDate < new Date(fechaDesde)) {
-                            showRow = false;
-                        }
-                        if (fechaHasta && rowDate > new Date(fechaHasta)) {
-                            showRow = false;
-                        }
-                    }
-                }
-            }
-            // Filtro por técnico (columna 6, usando el value del select)
-            if (filterTecnicoActive && row.cells[6]) {
-                var tecnicoSelect = row.cells[6].querySelector("select");
-                var tecnicoVal = tecnicoSelect ? tecnicoSelect.value.toLowerCase() : "";
-                if (filterTecnico && tecnicoVal.indexOf(filterTecnico) === -1) {
-                    showRow = false;
-                }
-            }
-            // Filtro por tipo de proyecto (columna 4)
-            if (filterTipoActive && row.cells[4]) {
-                var tipoVal = row.cells[4].innerText.trim().toLowerCase();
-                if (filterTipo && tipoVal.indexOf(filterTipo) === -1) {
-                    showRow = false;
-                }
-            }
-            // Filtro por estado (columna 9, usando el value del select)
-            if (filterEstadoActive && row.cells[9]) {
-                var estadoSelect = row.cells[9].querySelector("select");
-                var estadoVal = estadoSelect ? estadoSelect.value.toLowerCase() : "";
-                if (filterEstado && estadoVal.indexOf(filterEstado) === -1) {
-                    showRow = false;
-                }
-            }
-            // Filtro por aprobación (columna 7, usando el radio seleccionado)
-            if (filterAprobacionActive && row.cells[7]) {
-                var aprobacionRadio = row.cells[7].querySelector("input.estado-radio:checked");
-                var aprobacionVal = aprobacionRadio ? aprobacionRadio.value.toLowerCase() : "";
-                if (filterAprobacion && aprobacionVal.indexOf(filterAprobacion) === -1) {
-                    showRow = false;
-                }
-            }
-            // Filtro por cliente (columna 3)
-            if (filterClienteActive && row.cells[3]) {
-                var clienteVal = row.cells[3].innerText.trim().toLowerCase();
-                if (filterCliente && clienteVal.indexOf(filterCliente) === -1) {
-                    showRow = false;
-                }
-            }
-            row.style.display = showRow ? "" : "none";
-        });
-    }
-    // Eventos de filtrado
-    document.getElementById("applyFilters").addEventListener("click", applyAllFilters);
-    document.getElementById("searchInput").addEventListener("keyup", applyAllFilters);
-
-    // Modal y botones de acciones
-    var hojaModal = new bootstrap.Modal(document.getElementById('hojaModal'));
-    document.querySelectorAll(".hoja-btn").forEach(function(button) {
-        button.addEventListener("click", function() {
-            var presupuestoId = this.getAttribute("data-presupuesto-id");
-            var generarForm = document.getElementById("generarNuevoForm");
-            generarForm.action = "/hojas_trabajo/clonar/" + presupuestoId;
-            hojaModal.show();
-        });
-    });
-    document.querySelectorAll(".modificar-btn").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-            var row = this.closest("tr");
-            var id = row.getAttribute("data-id");
-            window.location.href = "{{ url_for('presupuestos_bp.editar_presupuesto', id=0) }}".replace("0", id);
-        });
-    });
-    function guardarCambios(row) {
-        var id = row.getAttribute("data-id");
-        var tecnico = row.querySelector(".tecnico-select").value;
-        var estadoRadio = row.querySelector("input.estado-radio:checked");
-        var aprobacion = estadoRadio ? estadoRadio.value : "";
-        var fecha_aprobacion = row.querySelector(".fecha-aprobacion").value;
-        var estado = row.querySelector(".estado-select").value;
-        var formData = new FormData();
-        formData.append("tecnico", tecnico);
-        formData.append("aprobacion", aprobacion);
-        formData.append("fecha_aprobacion", fecha_aprobacion);
-        formData.append("estado", estado);
-        fetch("{{ url_for('presupuestos_bp.actualizar_presupuesto_estado', id=0) }}".replace("0", id), {
-            method: "POST",
-            body: formData
-        }).then(response => response.text())
-          .then(data => {
-              console.log("Cambios guardados para el presupuesto " + id);
-          }).catch(error => {
-              console.error("Error al guardar los cambios", error);
-          });
-    }
-    document.querySelectorAll("input.estado-radio").forEach(function(radio) {
-        radio.addEventListener("change", function() {
-            var row = this.closest("tr");
-            var fechaInput = row.querySelector(".fecha-aprobacion");
-            var today = new Date();
-            var yyyy = today.getFullYear();
-            var mm = String(today.getMonth() + 1).padStart(2, "0");
-            var dd = String(today.getDate()).padStart(2, "0");
-            var todayStr = yyyy + "-" + mm + "-" + dd;
-            if (this.value === "aceptado" || this.value === "rechazado") {
-                fechaInput.value = todayStr;
-            }
-            row.classList.remove("table-success", "table-danger");
-            if (this.value === "aceptado") {
-                row.classList.add("table-success");
-            } else if (this.value === "rechazado") {
-                row.classList.add("table-danger");
-            }
-            guardarCambios(row);
-        });
-    });
-    document.querySelectorAll(".guardar-btn").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-            var row = this.closest("tr");
-            guardarCambios(row);
-        });
-    });
-});
-</script>
+<script src="{{ url_for('static', filename='custom.js') }}"></script>
 {% endblock %}
