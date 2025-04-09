@@ -120,7 +120,8 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener("click", function() {
             var row = this.closest("tr");
             var id = row.getAttribute("data-id");
-            window.location.href = "{{ url_for('presupuestos_bp.editar_presupuesto', id=0) }}".replace("0", id);
+            // Redirección manual a la URL correcta
+            window.location.href = "/presupuestos/editar/" + id;
         });
     });
     
@@ -137,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function() {
         formData.append("aprobacion", aprobacion);
         formData.append("fecha_aprobacion", fecha_aprobacion);
         formData.append("estado", estado);
-        fetch("{{ url_for('presupuestos_bp.actualizar_presupuesto_estado', id=0) }}".replace("0", id), {
+        fetch("/presupuestos/actualizar/" + id, {
             method: "POST",
             body: formData
         }).then(response => response.text())
