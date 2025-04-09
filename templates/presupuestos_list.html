@@ -30,13 +30,11 @@
           </div>
           <div class="input-group">
             <span class="input-group-text date-label" title="Desde" aria-label="Desde">Desde</span>
-            <input type="date" id="filterFechaDesde" class="form-control date-input" disabled 
-                   title="Fecha desde" aria-label="Fecha desde" placeholder="Desde">
+            <input type="date" id="filterFechaDesde" class="form-control date-input" disabled title="Fecha desde" aria-label="Fecha desde" placeholder="Desde">
           </div>
           <div class="input-group">
             <span class="input-group-text date-label" title="Hasta" aria-label="Hasta">Hasta</span>
-            <input type="date" id="filterFechaHasta" class="form-control date-input" disabled 
-                   title="Fecha hasta" aria-label="Fecha hasta" placeholder="Hasta">
+            <input type="date" id="filterFechaHasta" class="form-control date-input" disabled title="Fecha hasta" aria-label="Fecha hasta" placeholder="Hasta">
           </div>
         </div>
         <!-- Filtro Técnico -->
@@ -124,7 +122,7 @@
       <button id="applyFilters" class="btn btn-primary filters-btn" aria-label="Aplicar filtros">Aplicar Filtros</button>
     </div>
   </div>
-
+  
   <!-- Tabla de Presupuestos -->
   <table class="table table-striped" id="presupuestosTable">
     <thead>
@@ -170,8 +168,7 @@
           </div>
         </td>
         <td>
-          <input type="text" class="form-control fecha-aprobacion" readonly 
-                 value="{{ p[8] or '' }}" title="Fecha de aprobación" aria-label="Fecha de aprobación">
+          <input type="text" class="form-control fecha-aprobacion" readonly value="{{ p[8] or '' }}" title="Fecha de aprobación" aria-label="Fecha de aprobación">
         </td>
         <td>
           <select class="form-select estado-select" title="Seleccione estado" aria-label="Estado">
@@ -225,5 +222,6 @@
   </div>
 </div>
 
+<!-- Se incluye el script centralizado -->
 <script src="{{ url_for('static', filename='custom.js') }}"></script>
 {% endblock %}

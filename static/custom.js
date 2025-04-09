@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("filterAprobacion").disabled = !this.checked;
     });
 
+    // Función para aplicar filtros avanzados y búsqueda simple
     function applyAllFilters() {
         var filterFechaActive = document.getElementById("filterFechaCheck").checked;
         var fechaDesde = document.getElementById("filterFechaDesde").value;
@@ -30,11 +31,11 @@ document.addEventListener("DOMContentLoaded", function() {
         var filterAprobacion = document.getElementById("filterAprobacion").value.toLowerCase();
         var filterCliente = document.getElementById("filterCliente").value.toLowerCase();
         var searchValue = document.getElementById("searchInput").value.toLowerCase();
-
+    
         var rows = document.querySelectorAll("#presupuestosTable tbody tr");
         rows.forEach(function(row) {
             var showRow = true;
-            // Búsqueda simple en celdas 0 a 5 (ID, Referencia, Fecha, Cliente, Tipo Proyecto, Nombre Proyecto)
+            // Búsqueda simple en columnas 0 a 5
             var cellText = "";
             for (var i = 0; i <= 5; i++) {
                 if (row.cells[i]) {
@@ -44,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (searchValue && cellText.indexOf(searchValue) === -1) {
                 showRow = false;
             }
-            // Filtro por fecha (columna 2)
+            // Filtrado por fecha (columna 2)
             if (filterFechaActive && row.cells[2]) {
                 var fechaText = row.cells[2].innerText.trim();
                 if (fechaText) {
@@ -102,8 +103,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     document.getElementById("applyFilters").addEventListener("click", applyAllFilters);
     document.getElementById("searchInput").addEventListener("keyup", applyAllFilters);
-
-    // Modal y botones de acciones
+    
+    // Modal y botón para "H.Trabajo"
     var hojaModal = new bootstrap.Modal(document.getElementById('hojaModal'));
     document.querySelectorAll(".hoja-btn").forEach(function(button) {
         button.addEventListener("click", function() {
@@ -113,14 +114,17 @@ document.addEventListener("DOMContentLoaded", function() {
             hojaModal.show();
         });
     });
+    
+    // Botón de editar: redirige a la edición del presupuesto
     document.querySelectorAll(".modificar-btn").forEach(function(btn) {
         btn.addEventListener("click", function() {
             var row = this.closest("tr");
             var id = row.getAttribute("data-id");
-            console.log("Editar presupuesto con id:", id);
             window.location.href = "{{ url_for('presupuestos_bp.editar_presupuesto', id=0) }}".replace("0", id);
         });
     });
+    
+    // Función para guardar cambios vía AJAX
     function guardarCambios(row) {
         var id = row.getAttribute("data-id");
         var tecnico = row.querySelector(".tecnico-select").value;
@@ -143,6 +147,8 @@ document.addEventListener("DOMContentLoaded", function() {
               console.error("Error al guardar los cambios", error);
           });
     }
+    
+    // Actualización de estado mediante radio buttons
     document.querySelectorAll("input.estado-radio").forEach(function(radio) {
         radio.addEventListener("change", function() {
             var row = this.closest("tr");
@@ -164,6 +170,8 @@ document.addEventListener("DOMContentLoaded", function() {
             guardarCambios(row);
         });
     });
+    
+    // Botón guardar: envía cambios de la fila
     document.querySelectorAll(".guardar-btn").forEach(function(btn) {
         btn.addEventListener("click", function() {
             var row = this.closest("tr");

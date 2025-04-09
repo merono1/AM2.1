@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AM2.1 - Web</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
 </head>
+<link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+
 <body class="bg-light">
   <!-- Barra de navegación -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -28,7 +29,7 @@
     </div>
   </nav>
 
-  <!-- Contenido principal -->
+  <!-- Contenido principal a ancho completo -->
   <div class="container-fluid mt-4">
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -45,6 +46,6 @@
   </div>
 
   <!-- Scripts -->
-  <script src="{{ url_for('static', filename='custom.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
