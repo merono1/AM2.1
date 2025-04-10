@@ -6,14 +6,12 @@ from proveedores import proveedores_bp
 from hojas_trabajo import hojas_trabajo_bp
 from dbhelper import DBHelper, create_schema
 
-
 app = Flask(__name__)
 app.secret_key = "supersecreto"
 
 # Crear la base de datos y las tablas si no existen
 db = DBHelper()
 create_schema()
-
 
 # Registrar los blueprints
 app.register_blueprint(clientes_bp)

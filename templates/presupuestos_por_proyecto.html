@@ -1,0 +1,31 @@
+{% if presupuestos %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Referencia</th>
+        <th>Fecha</th>
+        <th>Título</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in presupuestos %}
+      <tr>
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>{{ p[2] }}</td>
+        <td>{{ p[3] }}</td>
+        <td>{{ p[4] }}</td>
+        <td>
+          <a href="{{ url_for('presupuestos_bp.editar_presupuesto', id=p[0]) }}" class="btn btn-sm btn-outline-primary">Editar</a>
+          <a href="{{ url_for('presupuestos_bp.editar_presupuesto', id=p[0]) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No hay presupuestos asociados a este proyecto.</p>
+{% endif %}

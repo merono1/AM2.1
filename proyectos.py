@@ -20,10 +20,12 @@ def generar_referencia(id_cliente, tipo_proyecto):
 
 @proyectos_bp.route("/proyectos", endpoint="listar_proyectos")
 def listar_proyectos():
+    # Se añade un subquery para contar presupuestos
     proyectos = db.execute_query("""
         SELECT pr.id, cl.nombre, pr.tipo_proyecto, pr.nombre_proyecto, pr.calle,
                pr.nombre_via, pr.numero, pr.puerta, pr.poblacion,
-               pr.fecha_creacion, pr.referencia
+               pr.fecha_creacion, pr.referencia,
+               (SELECT COUNT(*) FROM presupuestos WHERE id_proyecto = pr.id) AS num_presupuestos
         FROM proyectos pr
         JOIN clientes cl ON pr.id_cliente = cl.id
         ORDER BY pr.id DESC
@@ -99,7 +101,6 @@ def nuevo_proyecto_cliente(cliente_id):
         return redirect(url_for("proyectos_bp.listar_proyectos"))
 
     return render_template("proyectos_nuevo.html", cliente_id=cliente_id, cliente_nombre=cliente_nombre, clientes=clientes)
-# Añadir al final de proyectos.py
 
 @proyectos_bp.route("/proyectos/editar/<int:id>", methods=["GET", "POST"])
 def editar_proyecto(id):

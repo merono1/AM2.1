@@ -60,9 +60,10 @@
         <button type="submit" class="btn btn-danger">Borrar</button>
       </form>
 
-      <a href="{{ url_for('presupuestos_bp.nuevo_presupuesto_proyecto', proyecto_id=proyecto[0]) }}" class="btn btn-success">
+      <a href="{{ url_for('presupuestos_bp.nuevo_presupuesto', proyecto_id=proyecto[0]) }}" class="btn btn-success">
         Nuevo presupuesto
       </a>
+      
     </div>
   </form>
 </div>
