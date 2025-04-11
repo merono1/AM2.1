@@ -15,7 +15,7 @@ def generar_referencia_presupuesto(proyecto_id):
     tipo = db.execute_query("SELECT tipo_proyecto FROM proyectos WHERE id = ?", (proyecto_id,), fetchone=True)
     if tipo:
         tipo_proyecto = tipo[0]
-        # Si el tipo tiene al menos 5 caracteres se usan posiciones 0,2,4, de lo contrario se toman los tres primeros
+        # Si el tipo tiene al menos 5 caracteres se usan posiciones 0,2,4; de lo contrario se toman los tres primeros
         letras = (tipo_proyecto[0] + tipo_proyecto[2] + tipo_proyecto[4]).upper() if len(tipo_proyecto) >= 5 else tipo_proyecto[:3].upper()
     else:
         letras = "XXX"
@@ -65,15 +65,14 @@ def nuevo_presupuesto():
                 "proyecto_nombre": proyecto_info[0]
             }
     if request.method == "POST":
-        # Depuración: mostrar todos los datos enviados en el formulario
+        # Depuración: mostrar los datos recibidos
         print("Datos recibidos del formulario:", request.form)
         
-        # Se obtiene el proyecto_id desde el formulario (asegurándose que esté presente)
         proyecto_id = request.form.get("proyecto_id")
         if not proyecto_id:
             flash("Debe seleccionar un proyecto.", "danger")
             return render_template("presupuesto_nuevo.html", proyectos=proyectos, capitulos=[], **datos_proyecto)
-
+            
         titulo = request.form.get("titulo")
         tipo_via = request.form.get("tipo_via")
         nombre_via = request.form.get("nombre_via")
@@ -84,14 +83,14 @@ def nuevo_presupuesto():
         notas = request.form.get("notas")
         fecha = datetime.now().strftime("%Y-%m-%d")
         referencia = generar_referencia_presupuesto(proyecto_id)
-
+        
         presupuesto_id = db.execute_query("""
             INSERT INTO presupuestos (
                 id_proyecto, referencia, fecha, tipo_via, nombre_via, numero_via, puerta,
                 codigo_postal, poblacion, titulo, notas
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (proyecto_id, referencia, fecha, tipo_via, nombre_via, numero_via, puerta, codigo_postal, poblacion, titulo, notas))
-
+        
         # Procesamiento de capítulos y partidas del formulario
         form_dict = request.form.to_dict(flat=False)
         chapters = {}
@@ -135,16 +134,9 @@ def nuevo_presupuesto():
                 db.execute_query("""
                     INSERT INTO partidas (id_presupuesto, capitulo_numero, descripcion, unitario, cantidad, precio, total, margen, final)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    presupuesto_id, cap_num, partida.get('descripcion'),
-                    partida.get('unitario'),
-                    cantidad,
-                    precio,
-                    total,
-                    margen,
-                    final
-                ))
-                
+                """, (presupuesto_id, cap_num, partida.get('descripcion'), partida.get('unitario'),
+                      cantidad, precio, total, margen, final))
+        
         flash(f"Presupuesto creado correctamente. Referencia: {referencia}", "success")
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
     
@@ -215,35 +207,29 @@ def editar_presupuesto(id):
                 db.execute_query("""
                     INSERT INTO partidas (id_presupuesto, capitulo_numero, descripcion, unitario, cantidad, precio, total, margen, final)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    id, cap_num, partida.get('descripcion'),
-                    partida.get('unitario'),
-                    cantidad,
-                    precio,
-                    total,
-                    margen,
-                    final
-                ))
-                
+                """, (id, cap_num, partida.get('descripcion'), partida.get('unitario'),
+                      cantidad, precio, total, margen, final))
+        
         flash("Presupuesto actualizado correctamente.", "success")
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
     
     capitulos_rows = db.execute_query("SELECT * FROM capitulos WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True) or []
     capitulos = []
     for row in capitulos_rows:
-         cap = dict(row)
-         cap["tipo"] = cap["descripcion"]
-         partidas_rows = db.execute_query(
-             "SELECT * FROM partidas WHERE id_presupuesto = ? AND capitulo_numero LIKE ? ORDER BY id",
-             (id, f"{cap['numero']}.%"), fetch=True
-         ) or []
-         cap["partidas"] = [dict(p) for p in partidas_rows]
-         capitulos.append(cap)
+        cap = dict(row)
+        cap["tipo"] = cap["descripcion"]
+        partidas_rows = db.execute_query(
+            "SELECT * FROM partidas WHERE id_presupuesto = ? AND capitulo_numero LIKE ? ORDER BY id",
+            (id, f"{cap['numero']}.%"), fetch=True
+        ) or []
+        cap["partidas"] = [dict(p) for p in partidas_rows]
+        capitulos.append(cap)
     
     proyecto = db.execute_query("SELECT nombre_proyecto FROM proyectos WHERE id = ?", (presupuesto["id_proyecto"],), fetchone=True)
     proyecto_nombre = proyecto[0] if proyecto else ""
     
-    return render_template("presupuesto_nuevo.html", presupuesto=presupuesto, capitulos=capitulos, proyecto_id=presupuesto["id_proyecto"], proyecto_nombre=proyecto_nombre)
+    return render_template("presupuesto_nuevo.html", presupuesto=presupuesto, capitulos=capitulos,
+                           proyecto_id=presupuesto["id_proyecto"], proyecto_nombre=proyecto_nombre)
 
 @presupuestos_bp.route("/presupuestos/actualizar/<int:id>", methods=["POST"])
 def actualizar_presupuesto_estado(id):
@@ -275,7 +261,6 @@ def clonar_presupuesto(id):
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
     
     base_ref = re.sub(r" V\d+$", "", original["referencia"])
-    
     clones = db.execute_query("SELECT referencia FROM presupuestos WHERE referencia LIKE ?", (f"{base_ref} V%",), fetch=True)
     if clones:
         versions = []
@@ -300,19 +285,9 @@ def clonar_presupuesto(id):
             id_proyecto, referencia, fecha, tipo_via, nombre_via, numero_via, puerta,
             codigo_postal, poblacion, titulo, notas
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        original["id_proyecto"],
-        new_ref,
-        fecha,
-        original["tipo_via"],
-        original["nombre_via"],
-        original["numero_via"],
-        original["puerta"],
-        original["codigo_postal"],
-        original["poblacion"],
-        original["titulo"],
-        original["notas"]
-    ))
+    """, (original["id_proyecto"], new_ref, fecha, original["tipo_via"],
+          original["nombre_via"], original["numero_via"], original["puerta"],
+          original["codigo_postal"], original["poblacion"], original["titulo"], original["notas"]))
     
     capitulos = db.execute_query("SELECT * FROM capitulos WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True)
     for cap in capitulos:
@@ -320,22 +295,14 @@ def clonar_presupuesto(id):
             INSERT INTO capitulos (id_presupuesto, numero, descripcion)
             VALUES (?, ?, ?)
         """, (new_presupuesto_id, cap["numero"], cap["descripcion"]))
-        partidas = db.execute_query("SELECT * FROM partidas WHERE id_presupuesto = ? AND capitulo_numero LIKE ? ORDER BY id", (id, f"{cap['numero']}.%"), fetch=True)
+        partidas = db.execute_query("SELECT * FROM partidas WHERE id_presupuesto = ? AND capitulo_numero LIKE ? ORDER BY id",
+                                     (id, f"{cap['numero']}.%"), fetch=True)
         for part in partidas:
             db.execute_query("""
                 INSERT INTO partidas (id_presupuesto, capitulo_numero, descripcion, unitario, cantidad, precio, total, margen, final)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                new_presupuesto_id,
-                part["capitulo_numero"],
-                part["descripcion"],
-                part["unitario"],
-                part["cantidad"],
-                part["precio"],
-                part["total"],
-                part["margen"],
-                part["final"]
-            ))
+            """, (new_presupuesto_id, part["capitulo_numero"], part["descripcion"], part["unitario"],
+                  part["cantidad"], part["precio"], part["total"], part["margen"], part["final"]))
     
     flash(f"Presupuesto clonado correctamente. Nueva referencia: {new_ref}", "success")
     return redirect(url_for("presupuestos_bp.listar_presupuestos"))
@@ -359,17 +326,20 @@ def exportar_excel_presupuesto(id):
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
         
     capitulos = db.execute_query("SELECT * FROM capitulos WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True) or []
-    partidas = db.execute_query("SELECT * FROM partidas WHERE id_presupuestos = ? ORDER BY id", (id,), fetch=True) or []
+    partidas = db.execute_query("SELECT * FROM partidas WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True) or []
     
-    # Organizar los capítulos y sus partidas en un diccionario
+    # Organizar capítulos y sus partidas en un diccionario
     capitulos_dict = {}
     for cap in capitulos:
         capitulos_dict[cap["numero"]] = {"descripcion": cap["descripcion"], "partidas": []}
     for part in partidas:
-        cap_num = part["capitulo_numero"]
-        if cap_num in capitulos_dict:
-            capitulos_dict[cap_num]["partidas"].append(part)
-
+        # Convertimos la fila a diccionario para usar get()
+        part_dict = dict(part)
+        # Extraer el número de capítulo de la partida (antes del punto)
+        chapter_key = part_dict["capitulo_numero"].split('.')[0]
+        if chapter_key in capitulos_dict:
+            capitulos_dict[chapter_key]["partidas"].append(part_dict)
+    
     wb = Workbook()
     ws = wb.active
     ws.title = "Presupuesto"
@@ -383,7 +353,7 @@ def exportar_excel_presupuesto(id):
     ws["B3"] = presupuesto["fecha"]
     
     current_row = 5
-    # Recorrer los capítulos (ordenados numéricamente)
+    # Recorrer los capítulos ordenados numéricamente
     for cap_num in sorted(capitulos_dict.keys(), key=lambda x: float(x) if x.replace('.', '', 1).isdigit() else x):
         cap_data = capitulos_dict[cap_num]
         ws.cell(row=current_row, column=1, value=f"Capítulo {cap_num}")
@@ -418,10 +388,10 @@ def exportar_excel_presupuesto(id):
             current_row += 1
         current_row += 1
 
-    # Ajusta el ancho de las columnas automáticamente
+    # Ajuste automático del ancho de columnas
     for col in ws.columns:
         max_length = 0
-        column = get_column_letter(col[0].column)
+        column_letter = get_column_letter(col[0].column)
         for cell in col:
             try:
                 if cell.value:
@@ -430,16 +400,18 @@ def exportar_excel_presupuesto(id):
                         max_length = length
             except Exception:
                 pass
-        ws.column_dimensions[column].width = max_length + 2
+        ws.column_dimensions[column_letter].width = max_length + 2
     
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
     file_name = f"Presupuesto_{presupuesto['referencia']}.xlsx"
-    return send_file(output,
-                     as_attachment=True,
-                     download_name=file_name,
-                     mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=file_name,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
 
-# Regla alias para que la plantilla pueda construir la URL con el endpoint 'export_excel'
+# Alias para construir la URL desde la plantilla
 presupuestos_bp.add_url_rule("/presupuestos/export_excel/<int:id>", endpoint="export_excel", view_func=exportar_excel_presupuesto)
