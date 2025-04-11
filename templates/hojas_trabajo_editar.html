@@ -1,128 +1,251 @@
-<!-- hojas_trabajo_editar.html -->
 {% extends "layout.html" %}
+
 {% block content %}
 <div class="container-fluid mt-4">
-  <!-- Botón para volver al listado -->
-  <div class="mb-3">
-    <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-info" title="Volver al listado de hojas de trabajo">Ver Lista de Hojas de Trabajo</a>
+
+  <!-- Cabecera en una sola línea: Título + Botón "Ver lista" -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Editar Hoja de Trabajo</h2>
+    <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-info">
+      Ver Lista de Hojas de Trabajo
+    </a>
   </div>
-  <h2 title="Hoja de Trabajo">Hoja de Trabajo</h2>
-  
-  <!-- Encabezado con datos básicos -->
-  <div class="row mb-3">
-    <div class="col-md">
-      <label class="form-label" for="referencia">Referencia</label>
-      <input type="text" class="form-control" id="referencia" name="referencia" value="{{ hoja.referencia }}" readonly title="Referencia" placeholder="Referencia">
-    </div>
-    <div class="col-md">
-      <label class="form-label" for="fecha">Fecha</label>
-      <input type="date" class="form-control" id="fecha" name="fecha" value="{{ hoja.fecha }}" readonly title="Fecha" placeholder="Fecha">
-    </div>
-    <div class="col-md">
-      <label class="form-label" for="margenMedio">Margen (%)</label>
-      <!-- Campo editable para distribuir el margen en todas las partidas -->
-      <input type="number" step="any" class="form-control" id="margenMedio" value="0">
-    </div>
-    <div class="col-md">
-      <label class="form-label" for="tecnico_encargado">Técnico Encargado</label>
-      <input type="text" class="form-control" id="tecnico_encargado" name="tecnico_encargado" value="{{ hoja.tecnico_encargado|default('Sin asignar') }}" title="Técnico Encargado" placeholder="Técnico Encargado">
-    </div>
-    <div class="col-md">
-      <label class="form-label" for="cliente">Cliente</label>
-      <input type="text" class="form-control" id="cliente" name="cliente" value="{{ hoja.cliente|default('') }}" readonly title="Cliente" placeholder="Cliente">
-    </div>
-    <div class="col-md">
-      <label class="form-label" for="nombre_proyecto">Nombre de Proyecto</label>
-      <input type="text" class="form-control" id="nombre_proyecto" name="nombre_proyecto" value="{{ hoja.nombre_proyecto }}" readonly title="Nombre de Proyecto" placeholder="Nombre de Proyecto">
-    </div>
-  </div>
-  
-  <!-- Formulario para editar capítulos y partidas -->
+
   <form method="post" action="{{ url_for('hojas_trabajo_bp.editar_hoja_trabajo', id=hoja.id) }}">
+
+    <!-- Fila con 6 campos en una sola hilera -->
+    <div class="row g-2 mb-3 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label" for="referencia">Referencia</label>
+        <input type="text"
+               class="form-control"
+               id="referencia"
+               name="referencia"
+               value="{{ hoja.referencia }}"
+               readonly
+               title="Referencia de la hoja de trabajo">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="fecha">Fecha</label>
+        <input type="date"
+               class="form-control"
+               id="fecha"
+               name="fecha"
+               value="{{ hoja.fecha }}"
+               readonly
+               title="Fecha de creación de la hoja">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="margenMedio">Margen (%)</label>
+        <input type="number"
+               step="any"
+               class="form-control"
+               id="margenMedio"
+               value="0"
+               title="Margen promedio para ajustar a todas las partidas">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="tecnico_encargado">Técnico Encargado</label>
+        <input type="text"
+               class="form-control"
+               id="tecnico_encargado"
+               name="tecnico_encargado"
+               value="{{ hoja.tecnico_encargado|default('') }}"
+               title="Nombre del técnico encargado de la hoja">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="cliente">Cliente</label>
+        <input type="text"
+               class="form-control"
+               id="cliente"
+               value="{{ hoja.cliente|default('') }}"
+               readonly
+               title="Cliente asociado a la hoja">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label" for="nombre_proyecto">Proyecto</label>
+        <input type="text"
+               class="form-control"
+               id="nombre_proyecto"
+               value="{{ hoja.nombre_proyecto or '' }}"
+               readonly
+               title="Nombre del proyecto asociado">
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- CONTENEDOR PRINCIPAL DE CAPÍTULOS -->
     <div id="capitulosContainer">
       {% if capitulos %}
         {% for cap in capitulos %}
           {% set chap_idx = loop.index0 %}
-          <div class="card mb-3" data-capitulo-index="{{ chap_idx }}">
-            <div class="card-header">
-              <div class="row align-items-center">
-                <div class="col-auto">
-                  <h4 class="mb-0" title="Capítulo {{ loop.index }}">Capítulo {{ loop.index }}</h4>
-                </div>
-                <div class="col">
-                  <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][descripcion]" value="{{ cap.descripcion }}" placeholder="Descripción del capítulo" required title="Descripción del capítulo">
-                </div>
-              </div>
+          <div class="capitulo card mb-3" data-capitulo-index="{{ chap_idx }}">
+            <div class="card-header d-flex align-items-center">
+              <h4 class="mb-0 me-2">Capítulo {{ loop.index }}</h4>
+
+              <!-- SELECT para descripción del capítulo -->
+              <select name="capitulos[{{ chap_idx }}][descripcion]"
+                      class="form-select capitulo-select"
+                      title="Seleccione el tipo de capítulo para la hoja">
+                <option value="">Seleccione capítulo</option>
+                <option value="Trabajos preliminares"   {% if cap.descripcion == "Trabajos preliminares"   %}selected{% endif %}>Trabajos preliminares</option>
+                <option value="Demoliciones"            {% if cap.descripcion == "Demoliciones"            %}selected{% endif %}>Demoliciones</option>
+                <option value="Movimiento de tierras"   {% if cap.descripcion == "Movimiento de tierras"   %}selected{% endif %}>Movimiento de tierras</option>
+                <option value="Cimentaciones"           {% if cap.descripcion == "Cimentaciones"           %}selected{% endif %}>Cimentaciones</option>
+                <option value="Estructuras"             {% if cap.descripcion == "Estructuras"             %}selected{% endif %}>Estructuras</option>
+                <option value="Albañilería"             {% if cap.descripcion == "Albañilería"             %}selected{% endif %}>Albañilería</option>
+                <option value="Carpintería"             {% if cap.descripcion == "Carpintería"             %}selected{% endif %}>Carpintería</option>
+                <option value="Instalaciones eléctricas" {% if cap.descripcion == "Instalaciones eléctricas" %}selected{% endif %}>Instalaciones eléctricas</option>
+                <option value="Instalaciones de fontanería" {% if cap.descripcion == "Instalaciones de fontanería" %}selected{% endif %}>Instalaciones de fontanería</option>
+                <option value="Instalaciones de climatización" {% if cap.descripcion == "Instalaciones de climatización" %}selected{% endif %}>Instalaciones de climatización</option>
+                <option value="Pinturas y acabados finales" {% if cap.descripcion == "Pinturas y acabados finales" %}selected{% endif %}>Pinturas y acabados finales</option>
+                <option value="Urbanización y exteriores" {% if cap.descripcion == "Urbanización y exteriores" %}selected{% endif %}>Urbanización y exteriores</option>
+                <option value="Servicios documentales"   {% if cap.descripcion == "Servicios documentales"   %}selected{% endif %}>Servicios documentales</option>
+                <option value="Otros"                    {% if cap.descripcion == "Otros"                    %}selected{% endif %}>Otros</option>
+              </select>
+
+              <button type="button" class="btn btn-sm btn-danger ms-auto deleteCapituloBtn">
+                Borrar Capítulo
+              </button>
             </div>
             <div class="card-body">
-              {% if cap.partidas %}
+              <!-- PARTIDAS DE ESTE CAPÍTULO -->
+              <div class="partidasContainer"
+                   data-capitulo-index="{{ chap_idx }}"
+                   data-partida-index="{{ cap.partidas|length }}">
                 {% for part in cap.partidas %}
                   {% set part_idx = loop.index0 %}
-                  <div class="mb-3 border p-2">
-                    <!-- Primera fila: Número y Descripción -->
+                  <div class="partida border p-2 mb-2">
                     <div class="row">
-                      <div class="col-1">
-                        <label class="form-label small-label" title="Número">No.</label>
-                        <div class="fw-bold" title="Número de partida">{{ part.capitulo_numero }}</div>
-                      </div>
-                      <div class="col-11">
-                        <label class="form-label small-label" title="Descripción">Descripción</label>
-                        <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][descripcion]" value="{{ part.descripcion }}" placeholder="Descripción" required title="Descripción de la partida">
+                      <div class="col-12 mb-2">
+                        <label class="form-label small-label">Descripción de la partida</label>
+                        <input type="text"
+                               class="form-control"
+                               name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][descripcion]"
+                               value="{{ part.descripcion }}"
+                               placeholder="Descripción"
+                               title="Descripción de la partida"
+                               required>
                       </div>
                     </div>
-                    <!-- Segunda fila: Campos Unitario, Cantidad, Precio, Total, Margen, Final -->
-                    <div class="row mt-2">
-                      <div class="col">
-                        <label class="form-label small-label" title="Unitario">Unitario</label>
-                        <input type="text" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][unitario]" value="{{ part.unitario }}" placeholder="Unitario" required title="Unidad de medida">
+                    <div class="row">
+                      <div class="col-md-2">
+                        <label class="form-label small-label">Unitario</label>
+                        <select class="form-select"
+                                name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][unitario]"
+                                title="Unidad de medida"
+                                required>
+                          <option value="">Seleccione</option>
+                          <option value="ML" {% if part.unitario == "ML" %} selected {% endif %}>ML</option>
+                          <option value="M2" {% if part.unitario == "M2" %} selected {% endif %}>M2</option>
+                          <option value="M3" {% if part.unitario == "M3" %} selected {% endif %}>M3</option>
+                          <option value="PA" {% if part.unitario == "PA" %} selected {% endif %}>PA</option>
+                          <option value="UD" {% if part.unitario == "UD" %} selected {% endif %}>UD</option>
+                        </select>
                       </div>
-                      <div class="col">
-                        <label class="form-label small-label" title="Cantidad">Cantidad</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][cantidad]" value="{{ part.cantidad }}" placeholder="Cantidad" required title="Cantidad">
+                      <div class="col-md-2">
+                        <label class="form-label small-label" for="cantidad_{{ chap_idx }}_{{ part_idx }}">Cantidad</label>
+                        <input type="number"
+                               step="any"
+                               class="form-control"
+                               id="cantidad_{{ chap_idx }}_{{ part_idx }}"
+                               name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][cantidad]"
+                               value="{{ part.cantidad or 0 }}"
+                               title="Cantidad de esta partida"
+                               required>
                       </div>
-                      <div class="col">
-                        <label class="form-label small-label" title="Precio (€)">Precio (€)</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][precio]" value="{{ part.precio }}" placeholder="Precio" required title="Precio en euros">
+                      <div class="col-md-2">
+                        <label class="form-label small-label" for="precio_{{ chap_idx }}_{{ part_idx }}">Precio (€)</label>
+                        <input type="number"
+                               step="any"
+                               class="form-control"
+                               id="precio_{{ chap_idx }}_{{ part_idx }}"
+                               name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][precio]"
+                               value="{{ part.precio or 0 }}"
+                               title="Precio unitario en euros"
+                               required>
                       </div>
-                      <div class="col">
-                        <label class="form-label small-label" title="Total">Total</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][total]" value="{{ part.total }}" placeholder="Total" readonly title="Total">
+                      <div class="col-md-2">
+                        <label class="form-label small-label" for="total_{{ chap_idx }}_{{ part_idx }}">Total</label>
+                        <input type="number"
+                               step="any"
+                               class="form-control"
+                               id="total_{{ chap_idx }}_{{ part_idx }}"
+                               name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][total]"
+                               value="{{ part.total or 0 }}"
+                               title="Total (cantidad * precio)"
+                               readonly>
                       </div>
-                      <div class="col">
-                        <label class="form-label small-label" title="Margen (%)">Margen (%)</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][margen]" value="{{ part.margen }}" placeholder="Margen (%)" required title="Margen de beneficio en porcentaje">
+                      <div class="col-md-2">
+                        <label class="form-label small-label" for="margen_{{ chap_idx }}_{{ part_idx }}">Margen (%)</label>
+                        <input type="number"
+                               step="any"
+                               class="form-control"
+                               id="margen_{{ chap_idx }}_{{ part_idx }}"
+                               name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][margen]"
+                               value="{{ part.margen or 40 }}"
+                               title="Margen de beneficio (%)"
+                               required>
                       </div>
-                      <div class="col">
-                        <label class="form-label small-label" title="Final">Final</label>
-                        <input type="number" step="any" class="form-control" name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][final]" value="{{ part.final }}" placeholder="Final" readonly title="Precio final">
+                      <div class="col-md-2">
+                        <label class="form-label small-label" for="final_{{ chap_idx }}_{{ part_idx }}">Final</label>
+                        <input type="number"
+                               step="any"
+                               class="form-control"
+                               id="final_{{ chap_idx }}_{{ part_idx }}"
+                               name="capitulos[{{ chap_idx }}][partidas][{{ part_idx }}][final]"
+                               value="{{ part.final or 0 }}"
+                               title="Precio final (total + margen)"
+                               readonly>
+                      </div>
+                      <div class="col-12 mt-2 text-end">
+                        <button type="button"
+                                class="btn btn-sm btn-danger deletePartidaBtn"
+                                title="Borrar esta partida">
+                          Borrar Partida
+                        </button>
                       </div>
                     </div>
                   </div>
                 {% endfor %}
-              {% else %}
-                <p>No hay partidas para este capítulo.</p>
-              {% endif %}
+              </div>
+
+              <button type="button"
+                      class="btn btn-sm btn-secondary addPartidaBtn mt-2"
+                      data-capitulo-index="{{ chap_idx }}"
+                      title="Agregar una nueva partida a este capítulo">
+                Nueva Partida
+              </button>
             </div>
           </div>
         {% endfor %}
       {% else %}
-        <p>No hay capítulos asignados.</p>
+        <p>No hay capítulos asignados todavía en esta hoja de trabajo.</p>
       {% endif %}
     </div>
-    
-    <!-- Botón para agregar un capítulo nuevo -->
-    <button type="button" class="btn btn-outline-secondary mb-3" id="addCapituloBtn">Agregar Capítulo</button>
-    
-    <!-- Botones finales -->
+
+    <!-- BOTÓN PARA AÑADIR CAPÍTULO NUEVO -->
+    <button type="button"
+            class="btn btn-outline-secondary mb-3"
+            id="addCapituloBtn"
+            title="Agregar un nuevo capítulo a la hoja">
+      Agregar Capítulo
+    </button>
+
+    <!-- BOTONES FINALES -->
     <div class="d-flex justify-content-end">
       <button type="submit" class="btn btn-success" title="Guardar Cambios">Guardar Cambios</button>
-      <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary ms-2" title="Cancelar">Cancelar</a>
+      <a href="{{ url_for('hojas_trabajo_bp.listar_hojas') }}" class="btn btn-secondary ms-2" title="Cancelar la edición">
+        Cancelar
+      </a>
     </div>
   </form>
 </div>
 
+<!-- Script para manejar el cálculo de márgenes y la creación/eliminación dinámica de capítulos y partidas -->
 <script>
-  let headerOldAvg = 0;
+  let headerOldAvg = 0;  
 
   function recalcAverageMargin() {
     const marginInputs = document.querySelectorAll('input[name*="[margen]"]');
@@ -132,7 +255,7 @@
       sum += val;
       count++;
     });
-    const avg = count > 0 ? sum / count : 0;
+    const avg = (count > 0) ? sum / count : 0;
     document.getElementById('margenMedio').value = avg.toFixed(2);
     return avg;
   }
@@ -144,8 +267,7 @@
       const finalInput = row.querySelector('input[name*="[final]"]');
       const total = parseFloat(totalInput.value) || 0;
       const margen = parseFloat(margenInput.value) || 0;
-      const final = total * (1 + margen / 100);
-      finalInput.value = final.toFixed(2);
+      finalInput.value = (total * (1 + margen / 100)).toFixed(2);
     }
   }
 
@@ -153,239 +275,237 @@
     const marginInputs = document.querySelectorAll('input[name*="[margen]"]');
     marginInputs.forEach(function(input) {
       const currentVal = parseFloat(input.value) || 0;
-      const newVal = headerOldAvg === 0 ? newAvg : currentVal * (newAvg / headerOldAvg);
+      const newVal = (headerOldAvg === 0)
+        ? newAvg
+        : (currentVal * (newAvg / headerOldAvg));
       input.value = newVal.toFixed(2);
       updateFinalForMargin(input);
     });
     recalcAverageMargin();
   }
 
-  function attachMarginListeners() {
-    const marginInputs = document.querySelectorAll('input[name*="[margen]"]');
-    marginInputs.forEach(function(input) {
-      input.addEventListener('input', function() {
-        updateFinalForMargin(input);
-        recalcAverageMargin();
-      });
-    });
-  }
+  function addPartida(capIndex) {
+    const capDiv = document.querySelector(`.capitulo[data-capitulo-index="${capIndex}"]`);
+    const partidasContainer = capDiv.querySelector('.partidasContainer');
+    let partIndex = parseInt(partidasContainer.getAttribute('data-partida-index')) || 0;
 
-  function deletePartida(btn) {
-    const partidaDiv = btn.closest('.partida');
-    const partidasContainer = partidaDiv.parentElement;
-    partidasContainer.removeChild(partidaDiv);
-    recalcIndices();
-  }
-
-  function deleteCapitulo(btn) {
-    const capDiv = btn.closest('.capitulo');
-    const capIndex = parseInt(capDiv.getAttribute('data-capitulo-index'));
-    const capitulosContainer = document.getElementById('capitulosContainer');
-    if (capIndex === 0) {
-      alert("No se puede borrar el primer capítulo.");
-      return;
-    }
-    const chapters = capitulosContainer.querySelectorAll('.capitulo');
-    let prevChapter = null;
-    chapters.forEach(function(ch) {
-      if (parseInt(ch.getAttribute('data-capitulo-index')) === capIndex - 1) {
-        prevChapter = ch;
-      }
-    });
-    if (prevChapter) {
-      const partidasToMove = capDiv.querySelector('.partidasContainer');
-      const prevPartidasContainer = prevChapter.querySelector('.partidasContainer');
-      while (partidasToMove.firstChild) {
-        prevPartidasContainer.appendChild(partidasToMove.firstChild);
-      }
-    }
-    capitulosContainer.removeChild(capDiv);
-    recalcIndices();
-  }
-
-  function recalcIndices() {
-    const chapters = document.querySelectorAll('#capitulosContainer .capitulo');
-    chapters.forEach(function(chapter, i) {
-      chapter.setAttribute('data-capitulo-index', i);
-      const header = chapter.querySelector('h4');
-      header.textContent = "Capítulo " + (i + 1);
-      const select = chapter.querySelector('select[name^="capitulos"]');
-      select.setAttribute('name', `capitulos[${i}][tipo]`);
-      const partidasContainer = chapter.querySelector('.partidasContainer');
-      partidasContainer.setAttribute('data-capitulo-index', i);
-      const partidas = partidasContainer.querySelectorAll('.partida');
-      partidas.forEach(function(partida, j) {
-        const numberElem = partida.querySelector('span.fw-bold');
-        if(numberElem){
-          numberElem.textContent = (i + 1) + "." + (j + 1);
-        }
-        const inputs = partida.querySelectorAll('input, textarea, select');
-        inputs.forEach(function(input) {
-          const nameMatch = input.getAttribute('name').match(/\[([a-zA-Z0-9_]+)\]$/);
-          if (nameMatch) {
-            const field = nameMatch[1];
-            input.setAttribute('name', `capitulos[${i}][partidas][${j}][${field}]`);
-          }
-        });
-      });
-      partidasContainer.setAttribute('data-partida-index', partidas.length);
-    });
-  }
-
-  function addPartida(capituloIndex, chapterNumber) {
-    const partidasContainer = document.querySelector(`.partidasContainer[data-capitulo-index="${capituloIndex}"]`);
-    let partidaIndex = parseInt(partidasContainer.getAttribute('data-partida-index')) || 0;
-    const partidaNumber = chapterNumber + '.' + (partidaIndex + 1);
-    
-    const partidaDiv = document.createElement('div');
-    partidaDiv.className = 'partida border p-2 mb-2';
-    partidaDiv.innerHTML = `
-        <div class="row mb-2">
-          <div class="col">
-            <div class="d-flex align-items-center">
-              <span class="fw-bold me-2">${partidaNumber}</span>
-              <textarea name="capitulos[${capituloIndex}][partidas][${partidaIndex}][descripcion]" class="form-control flex-grow-1" rows="1" required></textarea>
-            </div>
-          </div>
+    const partDiv = document.createElement('div');
+    partDiv.className = 'partida border p-2 mb-2';
+    partDiv.innerHTML = `
+      <div class="row">
+        <div class="col-12 mb-2">
+          <label class="form-label small-label">Descripción de la partida</label>
+          <input type="text"
+                 class="form-control"
+                 name="capitulos[${capIndex}][partidas][${partIndex}][descripcion]"
+                 placeholder="Descripción"
+                 title="Descripción de la partida"
+                 required>
         </div>
-        <div class="row align-items-center">
-          <div class="col-md-2">
-            <label class="form-label">Unitarios</label>
-            <select name="capitulos[${capituloIndex}][partidas][${partidaIndex}][unitario]" class="form-select" required>
-              <option value="">Seleccione</option>
-              <option value="ML">ML</option>
-              <option value="M2">M2</option>
-              <option value="M3">M3</option>
-              <option value="PA">PA</option>
-              <option value="UD">UD</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Cantidad</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][cantidad]" class="form-control" required>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Precio (€)</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][precio]" class="form-control" required>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Total</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][total]" class="form-control" readonly>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Margen (%)</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][margen]" class="form-control partida-margen" value="40" required>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Final</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][final]" class="form-control partida-final" readonly>
-          </div>
-          <div class="col-12 text-end mt-2">
-            <button type="button" class="btn btn-danger btn-sm deletePartidaBtn">Borrar Partida</button>
-          </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <label class="form-label small-label">Unitario</label>
+          <select class="form-select"
+                  name="capitulos[${capIndex}][partidas][${partIndex}][unitario]"
+                  title="Unidad de medida"
+                  required>
+            <option value="">Seleccione</option>
+            <option value="ML">ML</option>
+            <option value="M2">M2</option>
+            <option value="M3">M3</option>
+            <option value="PA">PA</option>
+            <option value="UD">UD</option>
+          </select>
         </div>
+        <div class="col-md-2">
+          <label class="form-label small-label">Cantidad</label>
+          <input type="number"
+                 step="any"
+                 class="form-control"
+                 name="capitulos[${capIndex}][partidas][${partIndex}][cantidad]"
+                 value="0"
+                 title="Cantidad de esta partida"
+                 required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small-label">Precio (€)</label>
+          <input type="number"
+                 step="any"
+                 class="form-control"
+                 name="capitulos[${capIndex}][partidas][${partIndex}][precio]"
+                 value="0"
+                 title="Precio unitario en euros"
+                 required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small-label">Total</label>
+          <input type="number"
+                 step="any"
+                 class="form-control"
+                 name="capitulos[${capIndex}][partidas][${partIndex}][total]"
+                 value="0"
+                 title="Total (cantidad * precio)"
+                 readonly>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small-label">Margen (%)</label>
+          <input type="number"
+                 step="any"
+                 class="form-control"
+                 name="capitulos[${capIndex}][partidas][${partIndex}][margen]"
+                 value="40"
+                 title="Margen de beneficio (%)"
+                 required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small-label">Final</label>
+          <input type="number"
+                 step="any"
+                 class="form-control"
+                 name="capitulos[${capIndex}][partidas][${partIndex}][final]"
+                 value="0"
+                 title="Precio final (total + margen)"
+                 readonly>
+        </div>
+        <div class="col-12 mt-2 text-end">
+          <button type="button"
+                  class="btn btn-sm btn-danger deletePartidaBtn"
+                  title="Borrar esta partida">
+            Borrar Partida
+          </button>
+        </div>
+      </div>
     `;
-    
-    partidasContainer.appendChild(partidaDiv);
-    partidaIndex++;
-    partidasContainer.setAttribute('data-partida-index', partidaIndex);
-    
-    const cantidadInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][cantidad]"]`);
-    const precioInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][precio]"]`);
-    const totalInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][total]"]`);
-    const margenInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][margen]"]`);
-    
+
+    partidasContainer.appendChild(partDiv);
+    partIndex++;
+    partidasContainer.setAttribute('data-partida-index', partIndex);
+
+    const deleteBtn = partDiv.querySelector('.deletePartidaBtn');
+    deleteBtn.addEventListener('click', function() {
+      partDiv.remove();
+    });
+
+    const cantidadInput = partDiv.querySelector(`input[name="capitulos[${capIndex}][partidas][${partIndex}][cantidad]"]`);
+    const precioInput   = partDiv.querySelector(`input[name="capitulos[${capIndex}][partidas][${partIndex}][precio]"]`);
+    const totalInput    = partDiv.querySelector(`input[name="capitulos[${capIndex}][partidas][${partIndex}][total]"]`);
+    const margenInput   = partDiv.querySelector(`input[name="capitulos[${capIndex}][partidas][${partIndex}][margen]"]`);
+
     function updateTotal() {
-      const cantidad = parseFloat(cantidadInput.value) || 0;
-      const priceVal = parseFloat(precioInput.value) || 0;
-      const total = cantidad * priceVal;
-      totalInput.value = total.toFixed(2);
+      const cantidadVal = parseFloat(cantidadInput.value) || 0;
+      const precioVal   = parseFloat(precioInput.value)   || 0;
+      totalInput.value  = (cantidadVal * precioVal).toFixed(2);
       updateFinalForMargin(margenInput);
     }
-    
     cantidadInput.addEventListener('input', updateTotal);
     precioInput.addEventListener('input', updateTotal);
     margenInput.addEventListener('input', function() {
       updateFinalForMargin(margenInput);
       recalcAverageMargin();
     });
-    
-    partidaDiv.querySelector('.deletePartidaBtn').addEventListener('click', function() {
-      deletePartida(this);
+  }
+
+  function addCapitulo() {
+    const capitulosContainer = document.getElementById('capitulosContainer');
+    let currentChaps = capitulosContainer.querySelectorAll('.capitulo').length;
+    const newChapIndex = currentChaps;
+    const chapNumber = currentChaps + 1;
+
+    const capDiv = document.createElement('div');
+    capDiv.className = 'capitulo card mb-3';
+    capDiv.setAttribute('data-capitulo-index', newChapIndex);
+
+    capDiv.innerHTML = `
+      <div class="card-header d-flex align-items-center">
+        <h4 class="mb-0 me-2">Capítulo ${chapNumber}</h4>
+        <select name="capitulos[${newChapIndex}][descripcion]"
+                class="form-select capitulo-select"
+                title="Seleccione el tipo de capítulo">
+          <option value="">Seleccione capítulo</option>
+          <option value="Trabajos preliminares">Trabajos preliminares</option>
+          <option value="Demoliciones">Demoliciones</option>
+          <option value="Movimiento de tierras">Movimiento de tierras</option>
+          <option value="Cimentaciones">Cimentaciones</option>
+          <option value="Estructuras">Estructuras</option>
+          <option value="Albañilería">Albañilería</option>
+          <option value="Carpintería">Carpintería</option>
+          <option value="Instalaciones eléctricas">Instalaciones eléctricas</option>
+          <option value="Instalaciones de fontanería">Instalaciones de fontanería</option>
+          <option value="Instalaciones de climatización">Instalaciones de climatización</option>
+          <option value="Pinturas y acabados finales">Pinturas y acabados finales</option>
+          <option value="Urbanización y exteriores">Urbanización y exteriores</option>
+          <option value="Servicios documentales">Servicios documentales</option>
+          <option value="Otros">Otros</option>
+        </select>
+        <button type="button"
+                class="btn btn-sm btn-danger ms-auto deleteCapituloBtn"
+                title="Borrar este capítulo">
+          Borrar Capítulo
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="partidasContainer" data-capitulo-index="${newChapIndex}" data-partida-index="0">
+        </div>
+        <button type="button"
+                class="btn btn-sm btn-secondary addPartidaBtn mt-2"
+                data-capitulo-index="${newChapIndex}"
+                title="Agregar una nueva partida al capítulo">
+          Nueva Partida
+        </button>
+      </div>
+    `;
+
+    capitulosContainer.appendChild(capDiv);
+
+    const deleteBtn = capDiv.querySelector('.deleteCapituloBtn');
+    deleteBtn.addEventListener('click', function() {
+      capDiv.remove();
+    });
+
+    const addPartBtn = capDiv.querySelector('.addPartidaBtn');
+    addPartBtn.addEventListener('click', function() {
+      addPartida(newChapIndex);
     });
   }
 
   document.addEventListener("DOMContentLoaded", function(){
-    attachMarginListeners();
-    recalcAverageMargin();
-    
-    const margenMedioInput = document.getElementById('margenMedio');
-    margenMedioInput.addEventListener('focus', function() {
+    document.querySelectorAll('.capitulo').forEach(function(chDiv) {
+      const deleteCapBtn = chDiv.querySelector('.deleteCapituloBtn');
+      if (deleteCapBtn) {
+        deleteCapBtn.addEventListener('click', function(){
+          chDiv.remove();
+        });
+      }
+      chDiv.querySelectorAll('.partida').forEach(function(partDiv){
+        const delPartBtn = partDiv.querySelector('.deletePartidaBtn');
+        if (delPartBtn) {
+          delPartBtn.addEventListener('click', function(){
+            partDiv.remove();
+          });
+        }
+      });
+      const addPartBtn = chDiv.querySelector('.addPartidaBtn');
+      if (addPartBtn) {
+        addPartBtn.addEventListener('click', function(){
+          const capIndex = chDiv.getAttribute('data-capitulo-index');
+          addPartida(capIndex);
+        });
+      }
+    });
+
+    document.getElementById('addCapituloBtn').addEventListener('click', addCapitulo);
+
+    const marginMedioInput = document.getElementById('margenMedio');
+    marginMedioInput.addEventListener('focus', function() {
       headerOldAvg = recalcAverageMargin();
     });
-    margenMedioInput.addEventListener('change', function(){
+    marginMedioInput.addEventListener('change', function() {
       const newAvg = parseFloat(this.value) || 0;
       distributeNewAverage(newAvg);
     });
-    
-    let capituloContainer = document.getElementById('capitulosContainer');
-    let capituloCount = capituloContainer.children.length;
-    if (!capituloCount) { capituloCount = 0; }
-    
-    document.getElementById('addCapituloBtn').addEventListener('click', function() {
-      capituloCount++;
-      const capituloIndex = capituloCount - 1;
-      
-      const capituloDiv = document.createElement('div');
-      capituloDiv.className = 'capitulo mb-4 border p-3';
-      capituloDiv.setAttribute('data-capitulo-index', capituloIndex);
-      capituloDiv.innerHTML = `
-          <div class="d-flex align-items-center mb-3">
-            <h4 class="mb-0 me-2">Capítulo ${capituloCount}</h4>
-            <select name="capitulos[${capituloIndex}][tipo]" class="form-select w-auto me-2" required>
-              <option value="">Seleccione</option>
-              {% for opcion in capitulos_options %}
-                <option value="{{ opcion }}">{{ opcion }}</option>
-              {% endfor %}
-            </select>
-            <button type="button" class="btn btn-danger btn-sm deleteCapituloBtn">Borrar Capítulo</button>
-          </div>
-          <div class="partidasContainer" data-capitulo-index="${capituloIndex}" data-partida-index="0">
-          </div>
-          <button type="button" class="btn btn-info btn-sm addPartidaBtn" data-capitulo-index="${capituloIndex}">Nueva Partida</button>
-      `;
-      
-      capituloContainer.appendChild(capituloDiv);
-      
-      capituloDiv.querySelector('.deleteCapituloBtn').addEventListener('click', function() {
-        deleteCapitulo(this);
-      });
-      
-      // Asignar listener al botón "Nueva Partida" del nuevo capítulo
-      capituloDiv.querySelector('.addPartidaBtn').addEventListener('click', function() {
-        const capIndex = this.getAttribute('data-capitulo-index');
-        addPartida(capIndex, parseInt(capIndex) + 1);
-      });
-      
-      recalcIndices();
-    });
-    
-    document.querySelectorAll('.deleteCapituloBtn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        deleteCapitulo(this);
-      });
-    });
-    document.querySelectorAll('.deletePartidaBtn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        deletePartida(this);
-      });
-    });
-    document.querySelectorAll('.addPartidaBtn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const capIndex = this.getAttribute('data-capitulo-index');
-        addPartida(capIndex, parseInt(capIndex) + 1);
-      });
-    });
+
+    recalcAverageMargin();
   });
 </script>
 {% endblock %}

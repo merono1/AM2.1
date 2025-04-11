@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Presupuesto PDF</title>
   <style>
     body {
@@ -36,28 +37,6 @@
       background-color: #eee;
       font-weight: bold;
     }
-    .col-partida {
-      width: 8%;
-    }
-    .col-descripcion {
-      width: auto;
-    }
-    .col-unit {
-      width: 8%;
-    }
-    .col-cant {
-      width: 10%;
-    }
-    .col-precio {
-      width: 10%;
-    }
-    .col-total {
-      width: 10%;
-    }
-    .nota-pie {
-      font-size: 12px;
-      color: #666;
-    }
   </style>
 </head>
 <body>
@@ -72,12 +51,12 @@
 
   <hr>
 
-            <th class="col-partida">Partida</th>
-            <th class="col-descripcion">Descripción</th>
-            <th class="col-unit">Unit.</th>
-            <th class="col-cant">Cant.</th>
-            <th class="col-precio">Precio</th>
-            <th class="col-total">Total</th>
+  <div class="info">
+    Dirección:
+    {% if presupuesto["tipo_via"] %}{{ presupuesto["tipo_via"] }}{% endif %}
+    {% if presupuesto["nombre_via"] %} {{ presupuesto["nombre_via"] }}{% endif %}
+    {% if presupuesto["numero_via"] %}, Nº {{ presupuesto["numero_via"] }}{% endif %}
+    {% if presupuesto["puerta"] %}, {{ presupuesto["puerta"] }}{% endif %}
     {% if presupuesto["codigo_postal"] %} ({{ presupuesto["codigo_postal"] }}){% endif %}
     {% if presupuesto["poblacion"] %} - {{ presupuesto["poblacion"] }}{% endif %}
   </div>
@@ -94,13 +73,13 @@
       <table>
         <thead>
           <tr>
-            <th style="width: 8%">Partida</th>
+            </th style="width: 8%">Partida</th>
             <th>Descripción</th>
-            <th style="width: 8%">Unit.</th>
-            <th style="width: 10%">Cant.</th>
-            <th style="width: 10%">Precio</th>
-            <th style="width: 10%">Total</th>
-  <p class="nota-pie">
+            </th style="width: 8%">Unit.</th>
+            </th style="width: 10%">Cant.</th>
+            </th style="width: 10%">Precio</th>
+            </th style="width: 10%">Total</th>
+          </tr>
         </thead>
         <tbody>
           {% for p in cap["partidas"] %}
@@ -122,7 +101,7 @@
   {% endfor %}
 
   <hr>
-  <p style="font-size: 12px; color: #666;">
+  </p style="font-size: 12px; color: #666;">
     * Imprime este documento con tu navegador (Ctrl+P) y elige “Guardar como PDF”.
   </p>
 
