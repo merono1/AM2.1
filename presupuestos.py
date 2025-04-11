@@ -1,21 +1,18 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, make_response
 from dbhelper import DBHelper
 from datetime import datetime
 import re
 import io
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
+# (No librerías extra de pdfkit, etc.)
 
 presupuestos_bp = Blueprint("presupuestos_bp", __name__)
 db = DBHelper()
 
 def generar_referencia_presupuesto(proyecto_id):
     fecha = datetime.now().strftime("%d%m%y")
-    # Se obtiene el tipo de proyecto según el id proporcionado
     tipo = db.execute_query("SELECT tipo_proyecto FROM proyectos WHERE id = ?", (proyecto_id,), fetchone=True)
     if tipo:
         tipo_proyecto = tipo[0]
-        # Si el tipo tiene al menos 5 caracteres se usan posiciones 0,2,4; de lo contrario se toman los tres primeros
         letras = (tipo_proyecto[0] + tipo_proyecto[2] + tipo_proyecto[4]).upper() if len(tipo_proyecto) >= 5 else tipo_proyecto[:3].upper()
     else:
         letras = "XXX"
@@ -40,7 +37,6 @@ def listar_presupuestos():
 def nuevo_presupuesto():
     proyectos = db.execute_query("SELECT id, nombre_proyecto FROM proyectos", fetch=True)
     datos_proyecto = {}
-    # Se puede pasar proyecto_id desde la URL (por ejemplo, ?proyecto_id=5)
     proyecto_id_param = request.args.get("proyecto_id")
     if proyecto_id_param:
         proyecto_info = db.execute_query("""
@@ -65,14 +61,10 @@ def nuevo_presupuesto():
                 "proyecto_nombre": proyecto_info[0]
             }
     if request.method == "POST":
-        # Depuración: mostrar los datos recibidos
-        print("Datos recibidos del formulario:", request.form)
-        
         proyecto_id = request.form.get("proyecto_id")
         if not proyecto_id:
             flash("Debe seleccionar un proyecto.", "danger")
             return render_template("presupuesto_nuevo.html", proyectos=proyectos, capitulos=[], **datos_proyecto)
-            
         titulo = request.form.get("titulo")
         tipo_via = request.form.get("tipo_via")
         nombre_via = request.form.get("nombre_via")
@@ -91,8 +83,9 @@ def nuevo_presupuesto():
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (proyecto_id, referencia, fecha, tipo_via, nombre_via, numero_via, puerta, codigo_postal, poblacion, titulo, notas))
         
-        # Procesamiento de capítulos y partidas del formulario
+        # Procesamiento de capítulos y partidas
         form_dict = request.form.to_dict(flat=False)
+        import re
         chapters = {}
         chapter_pattern = re.compile(r'capitulos\[(\d+)\]\[tipo\]')
         for key, values in form_dict.items():
@@ -135,7 +128,7 @@ def nuevo_presupuesto():
                     INSERT INTO partidas (id_presupuesto, capitulo_numero, descripcion, unitario, cantidad, precio, total, margen, final)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (presupuesto_id, cap_num, partida.get('descripcion'), partida.get('unitario'),
-                      cantidad, precio, final, margen, final))
+                      cantidad, precio, total, margen, final))
         
         flash(f"Presupuesto creado correctamente. Referencia: {referencia}", "success")
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
@@ -166,6 +159,7 @@ def editar_presupuesto(id):
         db.execute_query("DELETE FROM partidas WHERE id_presupuesto = ?", (id,))
         
         form_dict = request.form.to_dict(flat=False)
+        import re
         chapters = {}
         chapter_pattern = re.compile(r'capitulos\[(\d+)\]\[tipo\]')
         for key, values in form_dict.items():
@@ -317,7 +311,10 @@ def listar_presupuestos_por_proyecto(proyecto_id):
     """, (proyecto_id,), fetch=True)
     return render_template("presupuestos_por_proyecto.html", presupuestos=presupuestos)
 
-# Nuevo endpoint: Exportar presupuesto a Excel
+# -------------------------------------------------------------------------
+# RUTA QUE EXPORTA A EXCEL
+# La función se llama exportar_excel_presupuesto. -> Endpoint por defecto: 'presupuestos_bp.exportar_excel_presupuesto'
+# -------------------------------------------------------------------------
 @presupuestos_bp.route("/presupuestos/excel/<int:id>")
 def exportar_excel_presupuesto(id):
     presupuesto = db.execute_query("SELECT * FROM presupuestos WHERE id = ?", (id,), fetchone=True)
@@ -328,7 +325,7 @@ def exportar_excel_presupuesto(id):
     capitulos = db.execute_query("SELECT * FROM capitulos WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True) or []
     partidas = db.execute_query("SELECT * FROM partidas WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True) or []
     
-    # Organizar capítulos y sus partidas en un diccionario
+    # Organizar capítulos
     capitulos_dict = {}
     for cap in capitulos:
         capitulos_dict[cap["numero"]] = {"descripcion": cap["descripcion"], "partidas": []}
@@ -338,11 +335,14 @@ def exportar_excel_presupuesto(id):
         if chapter_key in capitulos_dict:
             capitulos_dict[chapter_key]["partidas"].append(part_dict)
     
-    wb = Workbook()
+    import openpyxl
+    from openpyxl.utils import get_column_letter
+
+    wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Presupuesto"
     
-    # Datos de cabecera
+    # Cabecera
     ws["A1"] = "Referencia"
     ws["B1"] = presupuesto["referencia"]
     ws["A2"] = "Título"
@@ -351,7 +351,6 @@ def exportar_excel_presupuesto(id):
     ws["B3"] = presupuesto["fecha"]
     
     current_row = 5
-    # Recorrer los capítulos ordenados numéricamente
     for cap_num in sorted(capitulos_dict.keys(), key=lambda x: float(x) if x.replace('.', '', 1).isdigit() else x):
         cap_data = capitulos_dict[cap_num]
         ws.cell(row=current_row, column=1, value=f"Capítulo {cap_num}")
@@ -369,32 +368,23 @@ def exportar_excel_presupuesto(id):
             for part in cap_data["partidas"]:
                 ws.cell(row=current_row, column=2, value=part.get("descripcion"))
                 ws.cell(row=current_row, column=3, value=part.get("unitario"))
-                # Columna Cantidad (D)
-                cantidad_val = float(part.get("cantidad") or 0)
-                ws.cell(row=current_row, column=4, value=cantidad_val)
-                # Columna Precio (€) (E)
-                precio_val = float(part.get("precio") or 0)
-                ws.cell(row=current_row, column=5, value=precio_val)
-                # Columna Total (€) (F): fórmula = Cantidad * Precio
-                cell_cantidad = f"{get_column_letter(4)}{current_row}"
-                cell_precio = f"{get_column_letter(5)}{current_row}"
-                formula_total = f"={cell_cantidad}*{cell_precio}"
-                ws.cell(row=current_row, column=6, value=formula_total)
-                # Columna Margen (%) (G)
-                margen_val = float(part.get("margen") or 40)
-                ws.cell(row=current_row, column=7, value=margen_val)
-                # Columna Final (€) (H): fórmula = Total*(1+Margen/100)
-                cell_total = f"{get_column_letter(6)}{current_row}"
-                cell_margen = f"{get_column_letter(7)}{current_row}"
-                formula_final = f"={cell_total}*(1+{cell_margen}/100)"
-                ws.cell(row=current_row, column=8, value=formula_final)
+                ws.cell(row=current_row, column=4, value=float(part.get("cantidad") or 0))
+                ws.cell(row=current_row, column=5, value=float(part.get("precio") or 0))
+                ws.cell(row=current_row, column=6, value=float(part.get("total") or 0))
+                ws.cell(row=current_row, column=7, value=float(part.get("margen") or 40))
+                try:
+                    total_val = float(part.get("total") or 0)
+                    margen_val = float(part.get("margen") or 40)
+                    final_val = total_val * (1 + margen_val / 100)
+                except Exception:
+                    final_val = None
+                ws.cell(row=current_row, column=8, value=final_val)
                 current_row += 1
         else:
             ws.cell(row=current_row, column=2, value="Sin partidas")
             current_row += 1
         current_row += 1
 
-    # Ajuste automático del ancho de columnas
     for col in ws.columns:
         max_length = 0
         column_letter = get_column_letter(col[0].column)
@@ -404,7 +394,7 @@ def exportar_excel_presupuesto(id):
                     length = len(str(cell.value))
                     if length > max_length:
                         max_length = length
-            except Exception:
+            except:
                 pass
         ws.column_dimensions[column_letter].width = max_length + 2
     
@@ -419,5 +409,29 @@ def exportar_excel_presupuesto(id):
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-# Alias para construir la URL desde la plantilla
-presupuestos_bp.add_url_rule("/presupuestos/export_excel/<int:id>", endpoint="export_excel", view_func=exportar_excel_presupuesto)
+# -------------------------------------------------------------------------
+# OPCIONAL: Ruta para ver PDF (HTML) si lo tuvieras. No hace falta cambiar nada más.
+# -------------------------------------------------------------------------
+@presupuestos_bp.route("/presupuestos/ver_pdf/<int:id>")
+def ver_pdf_presupuesto(id):
+    presupuesto = db.execute_query("SELECT * FROM presupuestos WHERE id = ?", (id,), fetchone=True)
+    if not presupuesto:
+        flash("Presupuesto no encontrado.", "danger")
+        return redirect(url_for("presupuestos_bp.listar_presupuestos"))
+
+    capitulos = db.execute_query("SELECT * FROM capitulos WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True) or []
+    partidas = db.execute_query("SELECT * FROM partidas WHERE id_presupuesto = ? ORDER BY id", (id,), fetch=True) or []
+
+    capitulos_dict = {}
+    for cap in capitulos:
+        capitulos_dict[cap["numero"]] = {
+            "descripcion": cap["descripcion"],
+            "partidas": []
+        }
+    for part in partidas:
+        part_dict = dict(part)
+        chapter_key = part_dict["capitulo_numero"].split('.')[0]
+        if chapter_key in capitulos_dict:
+            capitulos_dict[chapter_key]["partidas"].append(part_dict)
+
+    return render_template("presupuesto_pdf_lite.html", presupuesto=presupuesto, capitulos=capitulos_dict)

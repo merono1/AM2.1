@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Presupuesto PDF</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      color: #000;
+    }
+    h1, h2, h3 {
+      margin: 0;
+      padding: 0;
+    }
+    .encabezado {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .info {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 4px 6px;
+    }
+    .capitulo-titulo {
+      background-color: #eee;
+      font-weight: bold;
+    }
+    .col-partida {
+      width: 8%;
+    }
+    .col-descripcion {
+      width: auto;
+    }
+    .col-unit {
+      width: 8%;
+    }
+    .col-cant {
+      width: 10%;
+    }
+    .col-precio {
+      width: 10%;
+    }
+    .col-total {
+      width: 10%;
+    }
+    .nota-pie {
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="encabezado">
+    <h2>Presupuesto {{ presupuesto["referencia"] }}</h2>
+    <div class="info">
+      Fecha: {{ presupuesto["fecha"] }} <br>
+      <strong>{{ presupuesto["titulo"] }}</strong>
+    </div>
+  </div>
+
+  <hr>
+
+            <th class="col-partida">Partida</th>
+            <th class="col-descripcion">Descripción</th>
+            <th class="col-unit">Unit.</th>
+            <th class="col-cant">Cant.</th>
+            <th class="col-precio">Precio</th>
+            <th class="col-total">Total</th>
+    {% if presupuesto["codigo_postal"] %} ({{ presupuesto["codigo_postal"] }}){% endif %}
+    {% if presupuesto["poblacion"] %} - {{ presupuesto["poblacion"] }}{% endif %}
+  </div>
+
+  <div class="info">
+    {{ presupuesto["notas"] }}
+  </div>
+
+  <hr>
+  
+  {% for num, cap in capitulos.items() %}
+    <p class="capitulo-titulo">Capítulo {{ num }}: {{ cap["descripcion"] }}</p>
+    {% if cap["partidas"] %}
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 8%">Partida</th>
+            <th>Descripción</th>
+            <th style="width: 8%">Unit.</th>
+            <th style="width: 10%">Cant.</th>
+            <th style="width: 10%">Precio</th>
+            <th style="width: 10%">Total</th>
+  <p class="nota-pie">
+        </thead>
+        <tbody>
+          {% for p in cap["partidas"] %}
+          <tr>
+            <td>{{ p["capitulo_numero"] }}</td>
+            <td>{{ p["descripcion"] }}</td>
+            <td>{{ p["unitario"] }}</td>
+            <td>{{ "%.2f"|format(p["cantidad"]) }}</td>
+            <td>{{ "%.2f"|format(p["precio"]) }} €</td>
+            <td>{{ "%.2f"|format(p["total"]) }} €</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No hay partidas en este capítulo.</p>
+    {% endif %}
+    <br>
+  {% endfor %}
+
+  <hr>
+  <p style="font-size: 12px; color: #666;">
+    * Imprime este documento con tu navegador (Ctrl+P) y elige “Guardar como PDF”.
+  </p>
+
+</body>
+</html>

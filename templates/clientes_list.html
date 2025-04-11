@@ -143,7 +143,7 @@
       
       <td>
         <a href="{{ url_for('clientes_bp.editar_cliente', cliente_id=cliente['id']) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
-        <form action="{{ url_for('clientes_bp.borrar_cliente', cliente_id=cliente['id']) }}" method="post" style="display:inline;">
+        </form action="{{ url_for('clientes_bp.borrar_cliente', cliente_id=cliente['id']) }}" method="post" style="display:inline;">
           <button type="submit" class="btn btn-sm btn-outline-danger">Borrar</button>
         </form>
         <a href="{{ url_for('proyectos_bp.nuevo_proyecto_cliente', cliente_id=cliente['id']) }}" class="btn btn-sm btn-outline-primary">Nuevo Proyecto</a>
