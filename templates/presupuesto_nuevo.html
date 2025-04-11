@@ -15,7 +15,6 @@
       <form method="post">
         <!-- Bloque Proyecto: se envía el campo "proyecto_id" -->
         {% if presupuesto %}
-          <!-- En modo edición, guardamos el id del proyecto en un campo oculto -->
           <input type="hidden" name="proyecto_id" value="{{ proyecto_id }}">
         {% else %}
           <div class="mb-3">
@@ -29,32 +28,30 @@
           </div>
         {% endif %}
 
-
-        <!-- Referencia, Título y Fecha en una misma línea -->
+        <!-- Referencia, Título y Fecha -->
         <div class="row mb-3 align-items-end">
           <div class="col-md-2">
             <label class="form-label">Referencia</label>
             <input type="text" class="form-control" name="referencia"
-                  value="{% if presupuesto %}{{ presupuesto.referencia }}{% else %}{{ referencia }}{% endif %}"
-                  readonly>
+                   value="{% if presupuesto %}{{ presupuesto.referencia }}{% else %}{{ referencia }}{% endif %}"
+                   readonly>
           </div>
           <div class="col-md-8">
             <label class="form-label">Título del presupuesto</label>
             <input type="text" class="form-control" name="titulo" id="titulo"
-                  value="{% if presupuesto %}{{ presupuesto.titulo }}{% else %}{{ titulo }}{% endif %}">
+                   value="{% if presupuesto %}{{ presupuesto.titulo }}{% else %}{{ titulo }}{% endif %}">
           </div>
           <div class="col-md-2">
             <label class="form-label">Fecha</label>
             <input type="date" class="form-control" name="fecha"
-                  value="{% if presupuesto %}{{ presupuesto.fecha }}{% else %}{{ fecha or '' }}{% endif %}"
-                  readonly>
+                   value="{% if presupuesto %}{{ presupuesto.fecha }}{% else %}{{ fecha or '' }}{% endif %}"
+                   readonly>
           </div>
         </div>
 
-
-        <!-- Notas y Datos de Dirección -->
+        <!-- Sección de Notas y Datos de Dirección en dos columnas -->
         <div class="row">
-          <!-- Notas -->
+          <!-- Columna de Notas -->
           <div class="col-md-6">
             <h5>Notas</h5>
             <div class="mb-3">
@@ -76,19 +73,11 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
 {% endif %}
               </textarea>
             </div>
-            <!-- Margen Medio -->
-            <div class="mb-3">
-              <label class="form-label">Margen Medio (%)</label>
-              <input type="number" step="any" id="margenMedio" class="form-control">
-              <small class="text-muted">
-                Promedio de los márgenes de las partidas. Si lo modificas, se ajustarán proporcionalmente.
-              </small>
-            </div>
           </div>
-          <!-- Datos de Dirección -->
+          <!-- Columna de Datos de Dirección y Acciones -->
           <div class="col-md-6">
             <h5>Datos de Dirección</h5>
-            <!-- Agrupar en una sola fila: tipo de vía, nombre de la vía, número y puerta -->
+            <!-- Primera fila: Tipo de vía, Nombre de la vía, Número y Puerta -->
             <div class="row mb-3">
               <div class="col-md-2">
                 <label for="tipo_via" class="form-label">Tipo de vía</label>
@@ -103,19 +92,19 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
               <div class="col-md-8">
                 <label for="nombre_via" class="form-label">Nombre de la vía</label>
                 <input type="text" class="form-control" name="nombre_via" id="nombre_via"
-                      value="{% if presupuesto %}{{ presupuesto.nombre_via }}{% else %}{{ nombre_via or '' }}{% endif %}">
+                       value="{% if presupuesto %}{{ presupuesto.nombre_via }}{% else %}{{ nombre_via or '' }}{% endif %}">
               </div>
               <div class="col-md-1">
                 <label for="numero_via" class="form-label">Número</label>
                 <input type="text" class="form-control" name="numero_via" id="numero_via"
-                      value="{% if presupuesto %}{{ presupuesto.numero_via }}{% else %}{{ numero_via or '' }}{% endif %}"
-                      maxlength="4">
+                       value="{% if presupuesto %}{{ presupuesto.numero_via }}{% else %}{{ numero_via or '' }}{% endif %}"
+                       maxlength="4">
               </div>
               <div class="col-md-1">
                 <label for="puerta" class="form-label">Puerta</label>
                 <input type="text" class="form-control" name="puerta" id="puerta"
-                      value="{% if presupuesto %}{{ presupuesto.puerta }}{% else %}{{ puerta or '' }}{% endif %}"
-                      maxlength="4">
+                       value="{% if presupuesto %}{{ presupuesto.puerta }}{% else %}{{ puerta or '' }}{% endif %}"
+                       maxlength="4">
               </div>
             </div>
             <!-- Segunda fila: Código Postal y Población -->
@@ -123,20 +112,51 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
               <div class="col-md-6">
                 <label for="codigo_postal" class="form-label">Código Postal</label>
                 <input type="text" class="form-control" name="codigo_postal" id="codigo_postal"
-                      value="{% if presupuesto %}{{ presupuesto.codigo_postal }}{% else %}{{ codigo_postal or '' }}{% endif %}"
-                      maxlength="5">
+                       value="{% if presupuesto %}{{ presupuesto.codigo_postal }}{% else %}{{ codigo_postal or '' }}{% endif %}"
+                       maxlength="5">
               </div>
               <div class="col-md-6">
                 <label for="poblacion" class="form-label">Población</label>
                 <input type="text" class="form-control" name="poblacion" id="poblacion"
-                      value="{% if presupuesto %}{{ presupuesto.poblacion }}{% else %}{{ poblacion or '' }}{% endif %}"
-                      maxlength="30">
+                       value="{% if presupuesto %}{{ presupuesto.poblacion }}{% else %}{{ poblacion or '' }}{% endif %}"
+                       maxlength="30">
               </div>
             </div>
-</div>
-
+            <!-- Tercera fila: Margen Medio y botones de acción -->
+            <div class="mb-3">
+              <label class="form-label">Margen Medio (%)</label>
+              <input type="number" step="any" id="margenMedio" class="form-control">
+              <small class="text-muted">
+                Promedio de los márgenes de las partidas. Si lo modificas, se ajustarán proporcionalmente.
+              </small>
+            </div>
+            <div class="mb-3">
+              <button type="button" class="btn btn-outline-secondary me-2" id="addCapituloBtn">
+                Agregar Capítulo
+              </button>
+              <button type="submit" class="btn btn-success me-2">
+                {% if presupuesto %}
+                  Guardar Cambios
+                {% else %}
+                  Guardar Presupuesto
+                {% endif %}
+              </button>
+              <a href="{{ url_for('presupuestos_bp.listar_presupuestos') }}" class="btn btn-secondary me-2">
+                Cancelar
+              </a>
+              {% if presupuesto %}
+                <button type="button" class="btn btn-outline-info" onclick="window.location.href='{{ url_for('presupuestos_bp.export_excel', id=presupuesto.id) }}';">
+                  Generar Excel
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- FIN de la sección de Notas / Datos de Dirección -->
 
         <hr>
+
+        <!-- CONTENEDOR DE CAPÍTULOS Y PARTIDAS -->
         {% set capitulos_options = [
           "Trabajos preliminares", "Demoliciones", "Movimiento de tierras", "Cimentaciones",
           "Estructuras", "Albañilería", "Carpintería", "Instalaciones eléctricas",
@@ -151,33 +171,46 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
               {% set cap_idx = loop.index0 %}
               {% set cap_index = loop.index %}
               <div class="capitulo mb-4 border p-3" data-capitulo-index="{{ cap_idx }}">
-                <!-- Cabecera del capítulo -->
+                <!-- Cabecera del capítulo: se muestra el título, el selector, Borrar Capítulo y, si no hay partidas, Nueva Partida -->
                 <div class="d-flex align-items-center mb-3">
                   <h4 class="mb-0 me-2">Capítulo {{ cap_index }}</h4>
                   <select name="capitulos[{{ cap_idx }}][tipo]" class="form-select w-auto me-2" required>
                     <option value="">Seleccione</option>
                     {% for opcion in capitulos_options %}
-                      <option value="{{ opcion }}" {% if capitulo.tipo == opcion %}selected{% endif %}>{{ opcion }}</option>
+                      <option value="{{ opcion }}" {% if capitulo.tipo == opcion %}selected{% endif %}>
+                        {{ opcion }}
+                      </option>
                     {% endfor %}
                   </select>
-                  <button type="button" class="btn btn-danger btn-sm deleteCapituloBtn">Borrar Capítulo</button>
+                  <button type="button" class="btn btn-danger btn-sm deleteCapituloBtn">
+                    Borrar Capítulo
+                  </button>
+                  {% if capitulo.partidas|length == 0 %}
+                    <button type="button" class="btn btn-secondary btn-sm addPartidaHeaderBtn ms-2">
+                      Nueva Partida
+                    </button>
+                  {% endif %}
                 </div>
                 <!-- Contenedor de partidas -->
-                <div class="partidasContainer" data-capitulo-index="{{ cap_idx }}" data-partida-index="{{ capitulo.partidas|length }}">
+                <div class="partidasContainer"
+                     data-capitulo-index="{{ cap_idx }}"
+                     data-partida-index="{{ capitulo.partidas|length }}">
                   {% for partida in capitulo.partidas %}
                     <div class="partida border p-2 mb-2">
                       <div class="row mb-2">
                         <div class="col">
                           <div class="d-flex align-items-center">
                             <span class="fw-bold me-2">{{ cap_index }}.{{ loop.index }}</span>
-                            <textarea name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][descripcion]" class="form-control flex-grow-1" rows="1" required>{{ partida.descripcion }}</textarea>
+                            <textarea name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][descripcion]"
+                                      class="form-control flex-grow-1" rows="1" required>{{ partida.descripcion }}</textarea>
                           </div>
                         </div>
                       </div>
                       <div class="row align-items-center">
                         <div class="col-md-2">
                           <label class="form-label">Unitarios</label>
-                          <select name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][unitario]" class="form-select" required>
+                          <select name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][unitario]"
+                                  class="form-select" required>
                             <option value="">Seleccione</option>
                             <option value="ML" {% if partida.unitario == 'ML' %}selected{% endif %}>ML</option>
                             <option value="M2" {% if partida.unitario == 'M2' %}selected{% endif %}>M2</option>
@@ -188,68 +221,70 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
                         </div>
                         <div class="col-md-2">
                           <label class="form-label">Cantidad</label>
-                          <input type="number" step="any" name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][cantidad]" class="form-control" required value="{{ partida.cantidad }}">
+                          <input type="number" step="any"
+                                 name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][cantidad]"
+                                 class="form-control" required value="{{ partida.cantidad }}">
                         </div>
                         <div class="col-md-2">
                           <label class="form-label">Precio (€)</label>
-                          <input type="number" step="any" name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][precio]" class="form-control" required value="{{ partida.precio }}">
+                          <input type="number" step="any"
+                                 name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][precio]"
+                                 class="form-control" required value="{{ partida.precio }}">
                         </div>
                         <div class="col-md-2">
                           <label class="form-label">Total</label>
-                          <input type="number" step="any" name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][total]" class="form-control" readonly value="{{ partida.total }}">
+                          <input type="number" step="any"
+                                 name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][total]"
+                                 class="form-control" readonly value="{{ partida.total }}">
                         </div>
                         <div class="col-md-2">
                           <label class="form-label">Margen (%)</label>
-                          <input type="number" step="any" name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][margen]" class="form-control partida-margen" required value="{{ partida.margen or 40 }}">
+                          <input type="number" step="any"
+                                 name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][margen]"
+                                 class="form-control partida-margen" required value="{{ partida.margen or 40 }}">
                         </div>
                         <div class="col-md-2">
                           <label class="form-label">Final</label>
-                          <input type="number" step="any" name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][final]" class="form-control partida-final" readonly value="{{ partida.final }}">
+                          <input type="number" step="any"
+                                 name="capitulos[{{ cap_idx }}][partidas][{{ loop.index0 }}][final]"
+                                 class="form-control partida-final" readonly value="{{ partida.final }}">
                         </div>
                         <div class="col-12 text-end mt-2">
-                          <button type="button" class="btn btn-danger btn-sm deletePartidaBtn">Borrar Partida</button>
+                          <button type="button" class="btn btn-danger btn-sm deletePartidaBtn">
+                            Borrar Partida
+                          </button>
+                          <button type="button" class="btn btn-secondary btn-sm addPartidaInlineBtn">
+                            Nueva Partida
+                          </button>
                         </div>
                       </div>
                     </div>
                   {% endfor %}
                 </div>
-                <!-- Botón "Nueva Partida" para este capítulo -->
-                <button type="button" class="btn btn-info btn-sm addPartidaBtn" data-capitulo-index="{{ cap_idx }}">Nueva Partida</button>
               </div>
             {% endfor %}
           {% else %}
             <!-- Si no hay capítulos, se deja el contenedor vacío -->
           {% endif %}
         </div>
-        
-        <!-- Botón para agregar un capítulo nuevo -->
-        <button type="button" class="btn btn-outline-secondary mb-3" id="addCapituloBtn">Agregar Capítulo</button>
-        
-        <!-- Botones finales -->
-        <div class="d-flex justify-content-end">
-          <button type="submit" class="btn btn-success me-2">
-            {% if presupuesto %}
-              Guardar Cambios
-            {% else %}
-              Guardar Presupuesto
-            {% endif %}
-          </button>
-          <a href="{{ url_for('presupuestos_bp.listar_presupuestos') }}" class="btn btn-secondary">Cancelar</a>
-
-          <!-- Botón para generar Excel (aparece si ya existe el presupuesto, por ejemplo modo edición) -->
-          {% if presupuesto %}
-            <button type="button" class="btn btn-outline-info ms-2" onclick="window.location.href='{{ url_for('presupuestos_bp.export_excel', id=presupuesto.id) }}';">
-              Generar Excel
-            </button>
-          {% endif %}
-        </div>
-
+        <!-- FIN del contenedor de capítulos y partidas -->
       </form>
     </div>
   </div>
 </div>
 
+<!-- Bloque hidden para generar las opciones del selector de capítulos -->
+<script type="text/template" id="capitulosOptionsTemplate">
+{% for opcion in capitulos_options %}
+<option value="{{ opcion }}">{{ opcion }}</option>
+{% endfor %}
+</script>
+
+{% raw %}
 <script>
+  // Obtenemos la cadena de opciones ya renderizada por Jinja desde el bloque hidden
+  const capitulosOptions = document.getElementById('capitulosOptionsTemplate').innerHTML.trim();
+
   let headerOldAvg = 0;
 
   function recalcAverageMargin() {
@@ -364,65 +399,78 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
     const partidasContainer = document.querySelector(`.partidasContainer[data-capitulo-index="${capituloIndex}"]`);
     let partidaIndex = parseInt(partidasContainer.getAttribute('data-partida-index')) || 0;
     const partidaNumber = chapterNumber + '.' + (partidaIndex + 1);
-    
+
     const partidaDiv = document.createElement('div');
     partidaDiv.className = 'partida border p-2 mb-2';
     partidaDiv.innerHTML = `
-        <div class="row mb-2">
-          <div class="col">
-            <div class="d-flex align-items-center">
-              <span class="fw-bold me-2">${partidaNumber}</span>
-              <textarea name="capitulos[${capituloIndex}][partidas][${partidaIndex}][descripcion]" class="form-control flex-grow-1" rows="1" required></textarea>
-            </div>
+      <div class="row mb-2">
+        <div class="col">
+          <div class="d-flex align-items-center">
+            <span class="fw-bold me-2">${partidaNumber}</span>
+            <textarea name="capitulos[${capituloIndex}][partidas][${partidaIndex}][descripcion]"
+                      class="form-control flex-grow-1" rows="1" required></textarea>
           </div>
         </div>
-        <div class="row align-items-center">
-          <div class="col-md-2">
-            <label class="form-label">Unitarios</label>
-            <select name="capitulos[${capituloIndex}][partidas][${partidaIndex}][unitario]" class="form-select" required>
-              <option value="">Seleccione</option>
-              <option value="ML">ML</option>
-              <option value="M2">M2</option>
-              <option value="M3">M3</option>
-              <option value="PA">PA</option>
-              <option value="UD">UD</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Cantidad</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][cantidad]" class="form-control" required>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Precio (€)</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][precio]" class="form-control" required>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Total</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][total]" class="form-control" readonly>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Margen (%)</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][margen]" class="form-control partida-margen" value="40" required>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Final</label>
-            <input type="number" step="any" name="capitulos[${capituloIndex}][partidas][${partidaIndex}][final]" class="form-control partida-final" readonly>
-          </div>
-          <div class="col-12 text-end mt-2">
-            <button type="button" class="btn btn-danger btn-sm deletePartidaBtn">Borrar Partida</button>
-          </div>
+      </div>
+      <div class="row align-items-center">
+        <div class="col-md-2">
+          <label class="form-label">Unitarios</label>
+          <select name="capitulos[${capituloIndex}][partidas][${partidaIndex}][unitario]"
+                  class="form-select" required>
+            <option value="">Seleccione</option>
+            <option value="ML">ML</option>
+            <option value="M2">M2</option>
+            <option value="M3">M3</option>
+            <option value="PA">PA</option>
+            <option value="UD">UD</option>
+          </select>
         </div>
+        <div class="col-md-2">
+          <label class="form-label">Cantidad</label>
+          <input type="number" step="any"
+                 name="capitulos[${capituloIndex}][partidas][${partidaIndex}][cantidad]"
+                 class="form-control" required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Precio (€)</label>
+          <input type="number" step="any"
+                 name="capitulos[${capituloIndex}][partidas][${partidaIndex}][precio]"
+                 class="form-control" required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Total</label>
+          <input type="number" step="any"
+                 name="capitulos[${capituloIndex}][partidas][${partidaIndex}][total]"
+                 class="form-control" readonly>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Margen (%)</label>
+          <input type="number" step="any"
+                 name="capitulos[${capituloIndex}][partidas][${partidaIndex}][margen]"
+                 class="form-control partida-margen" value="40" required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Final</label>
+          <input type="number" step="any"
+                 name="capitulos[${capituloIndex}][partidas][${partidaIndex}][final]"
+                 class="form-control partida-final" readonly>
+        </div>
+        <div class="col-12 text-end mt-2">
+          <button type="button" class="btn btn-danger btn-sm deletePartidaBtn">Borrar Partida</button>
+          <button type="button" class="btn btn-secondary btn-sm addPartidaInlineBtn">Nueva Partida</button>
+        </div>
+      </div>
     `;
-    
+
     partidasContainer.appendChild(partidaDiv);
     partidaIndex++;
     partidasContainer.setAttribute('data-partida-index', partidaIndex);
-    
+
     const cantidadInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][cantidad]"]`);
     const precioInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][precio]"]`);
     const totalInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][total]"]`);
     const margenInput = partidaDiv.querySelector(`input[name="capitulos[${capituloIndex}][partidas][${partidaIndex-1}][margen]"]`);
-    
+
     function updateTotal() {
       const cantidad = parseFloat(cantidadInput.value) || 0;
       const priceVal = parseFloat(precioInput.value) || 0;
@@ -430,23 +478,28 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
       totalInput.value = total.toFixed(2);
       updateFinalForMargin(margenInput);
     }
-    
+
     cantidadInput.addEventListener('input', updateTotal);
     precioInput.addEventListener('input', updateTotal);
     margenInput.addEventListener('input', function() {
       updateFinalForMargin(margenInput);
       recalcAverageMargin();
     });
-    
+
     partidaDiv.querySelector('.deletePartidaBtn').addEventListener('click', function() {
       deletePartida(this);
+    });
+    partidaDiv.querySelector('.addPartidaInlineBtn').addEventListener('click', function() {
+      const capDiv = this.closest('.capitulo');
+      const capIndex = capDiv.getAttribute('data-capitulo-index');
+      addPartida(capIndex, parseInt(capIndex) + 1);
     });
   }
 
   document.addEventListener("DOMContentLoaded", function(){
     attachMarginListeners();
     recalcAverageMargin();
-    
+
     const margenMedioInput = document.getElementById('margenMedio');
     margenMedioInput.addEventListener('focus', function() {
       headerOldAvg = recalcAverageMargin();
@@ -455,49 +508,47 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
       const newAvg = parseFloat(this.value) || 0;
       distributeNewAverage(newAvg);
     });
-    
+
     let capituloContainer = document.getElementById('capitulosContainer');
     let capituloCount = capituloContainer.children.length;
     if (!capituloCount) { capituloCount = 0; }
-    
+
     document.getElementById('addCapituloBtn').addEventListener('click', function() {
       capituloCount++;
       const capituloIndex = capituloCount - 1;
-      
+
       const capituloDiv = document.createElement('div');
       capituloDiv.className = 'capitulo mb-4 border p-3';
       capituloDiv.setAttribute('data-capitulo-index', capituloIndex);
       capituloDiv.innerHTML = `
-          <div class="d-flex align-items-center mb-3">
-            <h4 class="mb-0 me-2">Capítulo ${capituloCount}</h4>
-            <select name="capitulos[${capituloIndex}][tipo]" class="form-select w-auto me-2" required>
-              <option value="">Seleccione</option>
-              {% for opcion in capitulos_options %}
-                <option value="{{ opcion }}">{{ opcion }}</option>
-              {% endfor %}
-            </select>
-            <button type="button" class="btn btn-danger btn-sm deleteCapituloBtn">Borrar Capítulo</button>
-          </div>
-          <div class="partidasContainer" data-capitulo-index="${capituloIndex}" data-partida-index="0">
-          </div>
-          <button type="button" class="btn btn-info btn-sm addPartidaBtn" data-capitulo-index="${capituloIndex}">Nueva Partida</button>
+        <div class="d-flex align-items-center mb-3">
+          <h4 class="mb-0 me-2">Capítulo ${capituloCount}</h4>
+          <select name="capitulos[${capituloIndex}][tipo]" class="form-select w-auto me-2" required>
+            <option value="">Seleccione</option>
+            ${capitulosOptions}
+          </select>
+          <button type="button" class="btn btn-danger btn-sm deleteCapituloBtn">Borrar Capítulo</button>
+          <button type="button" class="btn btn-secondary btn-sm addPartidaHeaderBtn ms-2">Nueva Partida</button>
+        </div>
+        <div class="partidasContainer" data-capitulo-index="${capituloIndex}" data-partida-index="0">
+        </div>
       `;
-      
+
       capituloContainer.appendChild(capituloDiv);
-      
+
       capituloDiv.querySelector('.deleteCapituloBtn').addEventListener('click', function() {
         deleteCapitulo(this);
       });
-      
-      // Asignar listener al botón "Nueva Partida" del nuevo capítulo
-      capituloDiv.querySelector('.addPartidaBtn').addEventListener('click', function() {
-        const capIndex = this.getAttribute('data-capitulo-index');
+
+      capituloDiv.querySelector('.addPartidaHeaderBtn').addEventListener('click', function() {
+        const capDiv = this.closest('.capitulo');
+        const capIndex = capDiv.getAttribute('data-capitulo-index');
         addPartida(capIndex, parseInt(capIndex) + 1);
       });
-      
+
       recalcIndices();
     });
-    
+
     document.querySelectorAll('.deleteCapituloBtn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         deleteCapitulo(this);
@@ -508,12 +559,21 @@ Incluye mano de obra, equipos, maquinaria y medios auxiliares.
         deletePartida(this);
       });
     });
-    document.querySelectorAll('.addPartidaBtn').forEach(function(btn) {
+    document.querySelectorAll('.addPartidaInlineBtn').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        const capIndex = this.getAttribute('data-capitulo-index');
+        const capDiv = btn.closest('.capitulo');
+        const capIndex = capDiv.getAttribute('data-capitulo-index');
+        addPartida(capIndex, parseInt(capIndex) + 1);
+      });
+    });
+    document.querySelectorAll('.addPartidaHeaderBtn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const capDiv = btn.closest('.capitulo');
+        const capIndex = capDiv.getAttribute('data-capitulo-index');
         addPartida(capIndex, parseInt(capIndex) + 1);
       });
     });
   });
 </script>
+{% endraw %}
 {% endblock %}

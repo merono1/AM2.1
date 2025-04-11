@@ -135,7 +135,7 @@ def nuevo_presupuesto():
                     INSERT INTO partidas (id_presupuesto, capitulo_numero, descripcion, unitario, cantidad, precio, total, margen, final)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (presupuesto_id, cap_num, partida.get('descripcion'), partida.get('unitario'),
-                      cantidad, precio, total, margen, final))
+                      cantidad, precio, final, margen, final))
         
         flash(f"Presupuesto creado correctamente. Referencia: {referencia}", "success")
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
@@ -333,9 +333,7 @@ def exportar_excel_presupuesto(id):
     for cap in capitulos:
         capitulos_dict[cap["numero"]] = {"descripcion": cap["descripcion"], "partidas": []}
     for part in partidas:
-        # Convertimos la fila a diccionario para usar get()
         part_dict = dict(part)
-        # Extraer el número de capítulo de la partida (antes del punto)
         chapter_key = part_dict["capitulo_numero"].split('.')[0]
         if chapter_key in capitulos_dict:
             capitulos_dict[chapter_key]["partidas"].append(part_dict)
@@ -371,17 +369,25 @@ def exportar_excel_presupuesto(id):
             for part in cap_data["partidas"]:
                 ws.cell(row=current_row, column=2, value=part.get("descripcion"))
                 ws.cell(row=current_row, column=3, value=part.get("unitario"))
-                ws.cell(row=current_row, column=4, value=float(part.get("cantidad") or 0))
-                ws.cell(row=current_row, column=5, value=float(part.get("precio") or 0))
-                ws.cell(row=current_row, column=6, value=float(part.get("total") or 0))
-                ws.cell(row=current_row, column=7, value=float(part.get("margen") or 40))
-                try:
-                    total_val = float(part.get("total") or 0)
-                    margen_val = float(part.get("margen") or 40)
-                    final_val = total_val * (1 + margen_val / 100)
-                except Exception:
-                    final_val = None
-                ws.cell(row=current_row, column=8, value=final_val)
+                # Columna Cantidad (D)
+                cantidad_val = float(part.get("cantidad") or 0)
+                ws.cell(row=current_row, column=4, value=cantidad_val)
+                # Columna Precio (€) (E)
+                precio_val = float(part.get("precio") or 0)
+                ws.cell(row=current_row, column=5, value=precio_val)
+                # Columna Total (€) (F): fórmula = Cantidad * Precio
+                cell_cantidad = f"{get_column_letter(4)}{current_row}"
+                cell_precio = f"{get_column_letter(5)}{current_row}"
+                formula_total = f"={cell_cantidad}*{cell_precio}"
+                ws.cell(row=current_row, column=6, value=formula_total)
+                # Columna Margen (%) (G)
+                margen_val = float(part.get("margen") or 40)
+                ws.cell(row=current_row, column=7, value=margen_val)
+                # Columna Final (€) (H): fórmula = Total*(1+Margen/100)
+                cell_total = f"{get_column_letter(6)}{current_row}"
+                cell_margen = f"{get_column_letter(7)}{current_row}"
+                formula_final = f"={cell_total}*(1+{cell_margen}/100)"
+                ws.cell(row=current_row, column=8, value=formula_final)
                 current_row += 1
         else:
             ws.cell(row=current_row, column=2, value="Sin partidas")
