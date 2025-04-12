@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hoja de Trabajo - {{ hoja.referencia }}</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 14px; }
+    h2, h3 { margin: 0 0 10px; }
+    p { margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    table, th, td { border: 1px solid #000; }
+    th, td { padding: 4px 8px; text-align: left; }
+  </style>
+</head>
+<body>
+  <h2>Hoja de Trabajo</h2>
+  <p><strong>Referencia:</strong> {{ hoja.referencia }}</p>
+  <p><strong>Título:</strong> {{ hoja.titulo }}</p>
+  <p><strong>Fecha:</strong> {{ hoja.fecha }}</p>
+  <hr>
+  {% for cap_num, cap in capitulos.items() %}
+    <h3>Capítulo {{ cap_num }}: {{ cap.descripcion }}</h3>
+    {% if cap.partidas %}
+      <table>
+        <thead>
+          <tr>
+            <th>Descripción</th>
+            <th>Unitario</th>
+            <th>Cantidad</th>
+            <th>Precio (€)</th>
+            <th>Total (€)</th>
+            <th>Margen (%)</th>
+            <th>Final (€)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for part in cap.partidas %}
+          <tr>
+            <td>{{ part.descripcion }}</td>
+            <td>{{ part.unitario }}</td>
+            <td>{{ part.cantidad }}</td>
+            <td>{{ part.precio }}</td>
+            <td>{{ part.total }}</td>
+            <td>{{ part.margen }}</td>
+            <td>{{ part.final }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No hay partidas en este capítulo.</p>
+    {% endif %}
+  {% endfor %}
+</body>
+</html>
