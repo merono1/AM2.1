@@ -4,9 +4,26 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "data" / "app.db"
 
+def alter_table_add_columns(conn, table, columns):
+    """
+    Añade columnas a una tabla si no existen.
+    
+    :param conn: Conexión SQLite.
+    :param table: Nombre de la tabla.
+    :param columns: Lista de tuplas (nombre_columna, definición SQL de la columna).
+    """
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(f"PRAGMA table_info({table})")
+    existentes = [row["name"] for row in cursor.fetchall()]
+    for col, definition in columns:
+        if col not in existentes:
+            cursor.execute(f"ALTER TABLE {table} ADD COLUMN {col} {definition}")
+
 def create_schema():
     """
     Crea las tablas en la base de datos 'app.db' dentro de data/ y añade índices.
+    Si la tabla ya existe, se modifica para incluir las columnas que se esperan en la aplicación sin perder datos.
     """
     DB_PATH.parent.mkdir(exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
@@ -33,6 +50,13 @@ def create_schema():
         )
     """)
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_clientes_cif_nif ON clientes (cif_nif)")
+    
+    # Añadir columnas faltantes para clientes si no existen
+    alter_table_add_columns(conn, "clientes", [
+        ("tipo_cliente", "TEXT"),
+        ("categoria_cliente", "TEXT"),
+        ("notas", "TEXT")
+    ])
 
     # Proyectos (actualizado para incluir la columna nombre_via)
     cursor.execute("""

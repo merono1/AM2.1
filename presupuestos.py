@@ -1,11 +1,9 @@
-# presupuestos.py (versión completa, 437+ líneas)
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file, make_response
 from dbhelper import DBHelper
 from datetime import datetime
 import re
 import io
-# (No librerías extra de pdfkit, etc.)
+from helpers import extract_chapters
 
 presupuestos_bp = Blueprint("presupuestos_bp", __name__)
 db = DBHelper()
@@ -35,15 +33,10 @@ def listar_presupuestos():
     """, fetch=True)
     return render_template("presupuestos_list.html", presupuestos=presupuestos)
 
-# -------------------------------------------------------------------------
-# NUEVO PRESUPUESTO
-# -------------------------------------------------------------------------
 @presupuestos_bp.route("/presupuestos/nuevo", methods=["GET","POST"])
 def nuevo_presupuesto():
     proyectos = db.execute_query("SELECT id, nombre_proyecto FROM proyectos", fetch=True)
-
-    ### AÑADIDO: Convertir ?proyecto_id= a int si se pasa como query param
-    proyecto_id_param = request.args.get("proyecto_id")  # Este es string o None
+    proyecto_id_param = request.args.get("proyecto_id")
     if proyecto_id_param:
         try:
             proyecto_id_param = int(proyecto_id_param)
@@ -71,7 +64,6 @@ def nuevo_presupuesto():
                 "cliente_nombre": proyecto_info[7],
                 "referencia": generar_referencia_presupuesto(proyecto_id_param)
             }
-            # Podrías guardar también "proyecto_id" en datos_proyecto si lo usas en la plantilla
             datos_proyecto["proyecto_id"] = proyecto_id_param
 
     if request.method == "POST":
@@ -83,8 +75,6 @@ def nuevo_presupuesto():
                                    capitulos=[],
                                    proyecto_id_param=proyecto_id_param,
                                    **datos_proyecto)
-
-        # Convertir el id_proyecto a int para generar la referencia
         try:
             proyecto_id_int = int(proyecto_id)
         except ValueError:
@@ -110,41 +100,15 @@ def nuevo_presupuesto():
         """, (proyecto_id_int, referencia, fecha, tipo_via, nombre_via, numero_via,
               puerta, codigo_postal, poblacion, titulo, notas))
 
-        # Procesamiento de capítulos y partidas
+        # Procesar capítulos y partidas usando la función auxiliar
         form_dict = request.form.to_dict(flat=False)
-        import re
-        chapters = {}
-        chapter_pattern = re.compile(r'capitulos\[(\d+)\]\[tipo\]')
-        for key, values in form_dict.items():
-            m = chapter_pattern.match(key)
-            if m:
-                cap_idx = m.group(1)
-                chapters[cap_idx] = {'tipo': values[0], 'partidas': []}
-
-        partida_pattern = re.compile(r'capitulos\[(\d+)\]\[partidas\]\[(\d+)\]\[([^\]]+)\]')
-        partidas_group = {}
-        for key, values in form_dict.items():
-            m = partida_pattern.match(key)
-            if m:
-                cap_idx = m.group(1)
-                part_idx = m.group(2)
-                field = m.group(3)
-                if cap_idx not in partidas_group:
-                    partidas_group[cap_idx] = {}
-                if part_idx not in partidas_group[cap_idx]:
-                    partidas_group[cap_idx][part_idx] = {}
-                partidas_group[cap_idx][part_idx][field] = values[0]
-        for cap_idx, parts in partidas_group.items():
-            if cap_idx in chapters:
-                for part_idx in sorted(parts.keys(), key=int):
-                    chapters[cap_idx]['partidas'].append(parts[part_idx])
-
+        chapters = extract_chapters(form_dict, "tipo")
         for cap_idx, chapter in chapters.items():
             chapter_number = str(int(cap_idx) + 1)
             db.execute_query("""
-                INSERT INTO capitulos (id_presupuesto, numero, descripcion)
-                VALUES (?, ?, ?)
-            """, (presupuesto_id, chapter_number, chapter['tipo']))
+                    INSERT INTO capitulos (id_presupuesto, numero, descripcion)
+                    VALUES (?, ?, ?)
+                """, (presupuesto_id, chapter_number, chapter['tipo']))
             for i, partida in enumerate(chapter['partidas']):
                 cap_num = f"{chapter_number}.{i+1}"
                 cantidad = float(partida.get('cantidad') or 0)
@@ -157,11 +121,9 @@ def nuevo_presupuesto():
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (presupuesto_id, cap_num, partida.get('descripcion'), partida.get('unitario'),
                       cantidad, precio, total, margen, final))
-
         flash(f"Presupuesto creado correctamente. Referencia: {referencia}", "success")
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
 
-    # GET: devolvemos el form con capitulos vacíos, pasando 'proyecto_id_param' a la plantilla
     return render_template("presupuesto_nuevo.html",
                            proyectos=proyectos,
                            proyecto_id_param=proyecto_id_param,
@@ -192,32 +154,7 @@ def editar_presupuesto(id):
         db.execute_query("DELETE FROM partidas WHERE id_presupuesto = ?", (id,))
 
         form_dict = request.form.to_dict(flat=False)
-        import re
-        chapters = {}
-        chapter_pattern = re.compile(r'capitulos\[(\d+)\]\[tipo\]')
-        for key, values in form_dict.items():
-            m = chapter_pattern.match(key)
-            if m:
-                cap_idx = m.group(1)
-                chapters[cap_idx] = {'tipo': values[0], 'partidas': []}
-        partida_pattern = re.compile(r'capitulos\[(\d+)\]\[partidas\]\[(\d+)\]\[([^\]]+)\]')
-        partidas_group = {}
-        for key, values in form_dict.items():
-            m = partida_pattern.match(key)
-            if m:
-                cap_idx = m.group(1)
-                part_idx = m.group(2)
-                field = m.group(3)
-                if cap_idx not in partidas_group:
-                    partidas_group[cap_idx] = {}
-                if part_idx not in partidas_group[cap_idx]:
-                    partidas_group[cap_idx][part_idx] = {}
-                partidas_group[cap_idx][part_idx][field] = values[0]
-        for cap_idx, parts in partidas_group.items():
-            if cap_idx in chapters:
-                for part_idx in sorted(parts.keys(), key=int):
-                    chapters[cap_idx]['partidas'].append(parts[part_idx])
-
+        chapters = extract_chapters(form_dict, "tipo")
         for cap_idx, chapter in chapters.items():
             chapter_number = str(int(cap_idx) + 1)
             db.execute_query("""
@@ -236,7 +173,6 @@ def editar_presupuesto(id):
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (id, cap_num, partida.get('descripcion'), partida.get('unitario'),
                       cantidad, precio, total, margen, final))
-
         flash("Presupuesto actualizado correctamente.", "success")
         return redirect(url_for("presupuestos_bp.listar_presupuestos"))
 
@@ -344,9 +280,6 @@ def listar_presupuestos_por_proyecto(proyecto_id):
     """, (proyecto_id,), fetch=True)
     return render_template("presupuestos_por_proyecto.html", presupuestos=presupuestos)
 
-# -------------------------------------------------------------------------
-# RUTA QUE EXPORTA A EXCEL
-# -------------------------------------------------------------------------
 @presupuestos_bp.route("/presupuestos/excel/<int:id>")
 def exportar_excel_presupuesto(id):
     presupuesto = db.execute_query("SELECT * FROM presupuestos WHERE id = ?", (id,), fetchone=True)
@@ -436,9 +369,6 @@ def exportar_excel_presupuesto(id):
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-# -------------------------------------------------------------------------
-# OPCIONAL: Ruta para ver PDF
-# -------------------------------------------------------------------------
 @presupuestos_bp.route("/presupuestos/ver_pdf/<int:id>")
 def ver_pdf_presupuesto(id):
     presupuesto = db.execute_query("SELECT * FROM presupuestos WHERE id = ?", (id,), fetchone=True)

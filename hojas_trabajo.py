@@ -5,6 +5,7 @@ import re
 import io
 import openpyxl
 from openpyxl.utils import get_column_letter
+from helpers import extract_chapters
 
 hojas_trabajo_bp = Blueprint("hojas_trabajo_bp", __name__)
 db = DBHelper()
@@ -52,38 +53,19 @@ def editar_hoja_trabajo(id):
                 tecnico_encargado = ?
             WHERE id = ?
         """, (tecnico_encargado, id))
-        # Eliminamos capítulos y partidas actuales
         db.execute_query("DELETE FROM capitulos_hojas WHERE id_hoja = ?", (id,))
         db.execute_query("DELETE FROM partidas_hojas WHERE id_hoja = ?", (id,))
-        # Procesamiento del formulario (capítulos y partidas)
+
         form_dict = request.form.to_dict(flat=False)
-        chapters = {}
-        chapter_pattern = re.compile(r'^capitulos\[(\d+)\]\[descripcion\]$')
-        for key, value in form_dict.items():
-            m = chapter_pattern.match(key)
-            if m:
-                idx = m.group(1)
-                chapters[idx] = {"descripcion": value[0], "partidas": {}}
-        partida_pattern = re.compile(r'^capitulos\[(\d+)\]\[partidas\]\[(\d+)\]\[([^\]]+)\]$')
-        for key, value in form_dict.items():
-            m = partida_pattern.match(key)
-            if m:
-                chap_idx = m.group(1)
-                part_idx = m.group(2)
-                field = m.group(3)
-                if chap_idx in chapters:
-                    if part_idx not in chapters[chap_idx]["partidas"]:
-                        chapters[chap_idx]["partidas"][part_idx] = {}
-                    chapters[chap_idx]["partidas"][part_idx][field] = value[0]
+        chapters = extract_chapters(form_dict, "descripcion")
         for chap_idx, chap_data in chapters.items():
-            descripcion = chap_data["descripcion"]
             chapter_number = str(int(chap_idx) + 1)
             db.execute_query(
                 "INSERT INTO capitulos_hojas (id_hoja, numero, descripcion) VALUES (?, ?, ?)",
-                (id, chapter_number, descripcion)
+                (id, chapter_number, chap_data["descripcion"])
             )
-            for part_idx, part_data in chap_data["partidas"].items():
-                partida_number = f"{chapter_number}.{int(part_idx)+1}"
+            for i, part_data in enumerate(chap_data["partidas"]):
+                partida_number = f"{chapter_number}.{i+1}"
                 cantidad = float(part_data.get("cantidad", 0) or 0)
                 precio = float(part_data.get("precio", 0) or 0)
                 total = float(part_data.get("total", 0) or 0)
@@ -201,21 +183,16 @@ def clonar_hoja_trabajo(id):
     flash(f"Hoja de trabajo creada correctamente. Nueva referencia: {new_ref}", "success")
     return redirect(url_for("hojas_trabajo_bp.listar_hojas"))
 
-# --- NUEVOS ENDPOINTS CON FORMULAS Y TEMPLATE PDF ---
-
 @hojas_trabajo_bp.route("/hojas_trabajo/excel/<int:id>")
 def exportar_excel_hoja_trabajo(id):
-    # Obtener hoja de trabajo
     hoja = db.execute_query("SELECT * FROM hojas_trabajo WHERE id = ?", (id,), fetchone=True)
     if not hoja:
         flash("Hoja de trabajo no encontrada.", "danger")
         return redirect(url_for("hojas_trabajo_bp.listar_hojas"))
     
-    # Obtener capítulos y partidas asociados
     capitulos = db.execute_query("SELECT * FROM capitulos_hojas WHERE id_hoja = ? ORDER BY id", (id,), fetch=True) or []
     partidas = db.execute_query("SELECT * FROM partidas_hojas WHERE id_hoja = ? ORDER BY id", (id,), fetch=True) or []
     
-    # Organizar la información por capítulos
     capitulos_dict = {}
     for cap in capitulos:
         capitulos_dict[cap["numero"]] = {"descripcion": cap["descripcion"], "partidas": []}
@@ -228,7 +205,6 @@ def exportar_excel_hoja_trabajo(id):
     ws = wb.active
     ws.title = "Hoja de Trabajo"
     
-    # Cabecera
     ws["A1"] = "Referencia"
     ws["B1"] = hoja["referencia"]
     ws["A2"] = "Título"
@@ -243,27 +219,21 @@ def exportar_excel_hoja_trabajo(id):
         ws.cell(row=current_row, column=2, value=cap_data["descripcion"])
         current_row += 1
         if cap_data["partidas"]:
-            # Encabezados
             headers = ["Descripción", "Unitario", "Cantidad", "Precio (€)", "Total (€)", "Margen (%)", "Final (€)"]
             for j, header in enumerate(headers, start=2):
                 ws.cell(row=current_row, column=j, value=header)
             current_row += 1
             for part in cap_data["partidas"]:
                 r = current_row
-                # Descripción y unidad
                 ws.cell(row=r, column=2, value=part.get("descripcion"))
                 ws.cell(row=r, column=3, value=part.get("unitario"))
-                # Cantidad y Precio (valores)
                 cantidad = float(part.get("cantidad") or 0)
                 precio = float(part.get("precio") or 0)
                 ws.cell(row=r, column=4, value=cantidad)
                 ws.cell(row=r, column=5, value=precio)
-                # Total: fórmula = Cantidad * Precio
                 ws.cell(row=r, column=6, value=f"=D{r}*E{r}")
-                # Margen: valor
                 margen = float(part.get("margen") or 40)
                 ws.cell(row=r, column=7, value=margen)
-                # Final: fórmula = Total * (1 + Margen/100)
                 ws.cell(row=r, column=8, value=f"=F{r}*(1+G{r}/100)")
                 current_row += 1
         else:
@@ -311,5 +281,4 @@ def ver_pdf_hoja_trabajo(id):
         if key in capitulos_dict:
             capitulos_dict[key]["partidas"].append(dict(part))
     
-    # Renderiza la plantilla PDF (asegúrate de tener creada hoja_trabajo_pdf.html)
     return render_template("hoja_trabajo_pdf.html", hoja=hoja, capitulos=capitulos_dict)

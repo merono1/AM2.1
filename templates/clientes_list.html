@@ -36,9 +36,7 @@
         {% for t in ["telefono1", "telefono2", "telefono3", "telefono4"] %}
           {% if cliente[t] %}{% set _ = telefonos.append(cliente[t]) %}{% endif %}
         {% endfor %}
-        <button type="button" class="btn btn-sm btn-outline-info"
-                data-bs-toggle="modal"
-                data-bs-target="#modalTelefonos{{ cliente['id'] }}">
+        <button type="button" class="btn btn-sm btn-outline-info copiar-btn" data-correo="{{ telefonos|join(', ') }}" data-bs-toggle="modal" data-bs-target="#modalTelefonos{{ cliente['id'] }}">
           {{ telefonos|length }} teléfono{{ 's' if telefonos|length != 1 }}
         </button>
       
@@ -73,9 +71,7 @@
         {% set mails = [] %}
         {% if cliente["mail1"] %}{% set _ = mails.append(cliente["mail1"]) %}{% endif %}
         {% if cliente["mail2"] %}{% set _ = mails.append(cliente["mail2"]) %}{% endif %}
-        <button type="button" class="btn btn-sm btn-outline-info"
-                data-bs-toggle="modal"
-                data-bs-target="#modalCorreos{{ cliente['id'] }}">
+        <button type="button" class="btn btn-sm btn-outline-info copiar-btn" data-correo="{{ mails|join(', ') }}" data-bs-toggle="modal" data-bs-target="#modalCorreos{{ cliente['id'] }}">
           {{ mails|length }} correo{{ 's' if mails|length != 1 }}
         </button>
 
@@ -110,9 +106,7 @@
       <td>{{ cliente["categoria_cliente"] or "" }}</td>
       <td>
         {% if cliente["notas"] %}
-          <button type="button" class="btn btn-sm btn-outline-info"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalNotas{{ cliente['id'] }}">
+          <button type="button" class="btn btn-sm btn-outline-info copiar-btn" data-correo="{{ cliente['notas'] }}" data-bs-toggle="modal" data-bs-target="#modalNotas{{ cliente['id'] }}">
             Sí
           </button>
       
@@ -143,7 +137,7 @@
       
       <td>
         <a href="{{ url_for('clientes_bp.editar_cliente', cliente_id=cliente['id']) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
-        </form action="{{ url_for('clientes_bp.borrar_cliente', cliente_id=cliente['id']) }}" method="post" style="display:inline;">
+        <form action="{{ url_for('clientes_bp.borrar_cliente', cliente_id=cliente['id']) }}" method="post" style="display:inline;">
           <button type="submit" class="btn btn-sm btn-outline-danger">Borrar</button>
         </form>
         <a href="{{ url_for('proyectos_bp.nuevo_proyecto_cliente', cliente_id=cliente['id']) }}" class="btn btn-sm btn-outline-primary">Nuevo Proyecto</a>
@@ -152,21 +146,4 @@
     {% endfor %}
   </tbody>
 </table>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const botones = document.querySelectorAll(".copiar-btn");
-    botones.forEach(boton => {
-      boton.addEventListener("click", function() {
-        const correo = this.getAttribute("data-correo");
-        navigator.clipboard.writeText(correo).then(() => {
-          this.textContent = "Copiado";
-          setTimeout(() => {
-            this.textContent = "Copiar";
-          }, 1500);
-        });
-      });
-    });
-  });
-</script>
 {% endblock %}
