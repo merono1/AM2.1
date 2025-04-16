@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Presupuesto PDF</title>
   <style>
     body {
@@ -10,7 +9,21 @@
       margin: 20px;
       color: #000;
     }
-    h1, h2, h3 {
+    header {
+      border-bottom: 2px solid #000;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    header img {
+      max-height: 80px;
+      margin-right: 20px;
+    }
+    header .empresa-info {
+      font-size: 14px;
+    }
+    h2, h3 {
       margin: 0;
       padding: 0;
     }
@@ -31,20 +44,31 @@
       border: 1px solid #ccc;
     }
     th, td {
-      padding: 4px 6px;
+      padding: 6px;
     }
     .capitulo-titulo {
       background-color: #eee;
       font-weight: bold;
+      padding: 4px 6px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-
+  <header>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Empresa">
+    <div class="empresa-info">
+      <strong>Nombre de la Empresa</strong><br>
+      Dirección de la Empresa<br>
+      Teléfono: 000-000-000<br>
+      Email: info@empresa.com
+    </div>
+  </header>
+  
   <div class="encabezado">
     <h2>Presupuesto {{ presupuesto["referencia"] }}</h2>
     <div class="info">
-      Fecha: {{ presupuesto["fecha"] }} <br>
+      Fecha: {{ presupuesto["fecha"] }}<br>
       <strong>{{ presupuesto["titulo"] }}</strong>
     </div>
   </div>
@@ -52,11 +76,11 @@
   <hr>
 
   <div class="info">
-    Dirección:
+    <strong>Dirección:</strong>
     {% if presupuesto["tipo_via"] %}{{ presupuesto["tipo_via"] }}{% endif %}
     {% if presupuesto["nombre_via"] %} {{ presupuesto["nombre_via"] }}{% endif %}
     {% if presupuesto["numero_via"] %}, Nº {{ presupuesto["numero_via"] }}{% endif %}
-    {% if presupuesto["puerta"] %}, {{ presupuesto["puerta"] }}{% endif %}
+    {% if presupuesto["puerta"] %}, Puerta {{ presupuesto["puerta"] }}{% endif %}
     {% if presupuesto["codigo_postal"] %} ({{ presupuesto["codigo_postal"] }}){% endif %}
     {% if presupuesto["poblacion"] %} - {{ presupuesto["poblacion"] }}{% endif %}
   </div>
@@ -68,17 +92,17 @@
   <hr>
   
   {% for num, cap in capitulos.items() %}
-    <p class="capitulo-titulo">Capítulo {{ num }}: {{ cap["descripcion"] }}</p>
+    <div class="capitulo-titulo">Capítulo {{ num }}: {{ cap["descripcion"] }}</div>
     {% if cap["partidas"] %}
       <table>
         <thead>
           <tr>
-            </th style="width: 8%">Partida</th>
+            <th style="width:8%;">Partida</th>
             <th>Descripción</th>
-            </th style="width: 8%">Unit.</th>
-            </th style="width: 10%">Cant.</th>
-            </th style="width: 10%">Precio</th>
-            </th style="width: 10%">Total</th>
+            <th style="width:8%;">Unit.</th>
+            <th style="width:10%;">Cant.</th>
+            <th style="width:10%;">Precio</th>
+            <th style="width:10%;">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -101,9 +125,8 @@
   {% endfor %}
 
   <hr>
-  </p style="font-size: 12px; color: #666;">
-    * Imprime este documento con tu navegador (Ctrl+P) y elige “Guardar como PDF”.
+  <p style="font-size: 12px; color: #666;">
+    * Para obtener este documento en PDF, guárdalo directamente desde el botón de descarga.
   </p>
-
 </body>
 </html>
